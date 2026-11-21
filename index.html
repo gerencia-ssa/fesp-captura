@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&family=Noto+Serif:wght@600;700&display=swap">
+<script src="config.js"></script>
+<title>Plan de Acción FESP · Captura jurisdiccional</title>
+<style>
+:root{--g:#701631;--g2:#911C3B;--o:#AE851E;--bg:#F7F4F2;--card:#fff;--tx:#24191C;--mu:#6B5F62;--ln:#E6DEDF;--ok:#2e7d4f;--md:#b7791f;--lo:#9b2c2c;--r:12px}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Noto Sans",system-ui,-apple-system,"Segoe UI",Arial,sans-serif;background:var(--bg);color:var(--tx);font-size:15px;line-height:1.45}
+header{background:var(--g);color:#fff;padding:18px 16px 14px}
+header h1{margin:0;font-size:18px;font-weight:600;letter-spacing:.2px}
+header p{margin:4px 0 0;font-size:13px;opacity:.85}
+.demo{background:#fff4d6;color:#6b4e00;font-size:13px;padding:8px 16px;border-bottom:1px solid #eadcae}
+.wrap{max-width:920px;margin:0 auto;padding:14px}
+.steps{display:flex;gap:6px;margin:4px 0 14px}
+.steps div{flex:1;text-align:center;font-size:12px;padding:8px 4px;border-radius:999px;background:#ebe5db;color:var(--mu);font-weight:600}
+.steps div.on{background:var(--g);color:#fff}
+.steps div.done{background:#d9cbb4;color:var(--g)}
+.card{background:var(--card);border:1px solid var(--ln);border-radius:var(--r);padding:16px;margin-bottom:14px}
+.card h2{font-size:16px;margin:0 0 4px;color:var(--g)}
+.card h3{font-size:15px;margin:14px 0 6px}
+.hint{font-size:12.5px;color:var(--mu);margin:2px 0 8px}
+label.f{display:block;font-weight:600;font-size:13.5px;margin:12px 0 4px}
+label.f .req{color:var(--lo)}
+input[type=text],input[type=email],input[type=tel],input[type=date],select,textarea{width:100%;padding:10px 11px;border:1px solid #cfc6b8;border-radius:9px;font:inherit;background:#fff}
+textarea{min-height:84px;resize:vertical}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--o);border-color:var(--o)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}
+@media(max-width:640px){.grid2{grid-template-columns:1fr}}
+.btn{border:0;border-radius:9px;padding:11px 16px;font:inherit;font-weight:600;cursor:pointer}
+.bp{background:var(--g);color:#fff}.bp:hover{background:var(--g2)}
+.bs{background:#ebe5db;color:var(--g)}
+.bl{background:transparent;color:var(--lo);padding:6px 8px;font-size:13px}
+.nav{display:flex;justify-content:space-between;gap:10px;margin-top:6px}
+.area{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--o);margin:14px 0 6px}
+.fesp-opt{display:flex;gap:10px;align-items:flex-start;padding:10px;border:1px solid var(--ln);border-radius:10px;margin-bottom:6px;cursor:pointer;background:#fff}
+.fesp-opt.sel{border-color:var(--g);background:#faf3f5}
+.fesp-opt input{margin-top:3px;accent-color:var(--g)}
+.num{display:inline-block;min-width:26px;height:26px;border-radius:50%;background:var(--g);color:#fff;font-size:12.5px;font-weight:700;text-align:center;line-height:26px;margin-right:8px;flex:none}
+details.info{background:#faf7f2;border:1px solid var(--ln);border-radius:10px;padding:8px 12px;margin:8px 0}
+details.info summary{cursor:pointer;font-weight:600;font-size:13px;color:var(--g)}
+details.info p,details.info li{font-size:13px}
+.brecha{border:1px dashed #cdbfa9;border-radius:10px;padding:12px;margin:12px 0;background:#fffdfa}
+.bh{display:flex;justify-content:space-between;align-items:center}
+.bh b{color:var(--g)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{display:flex;gap:6px;align-items:center;border:1px solid #d8cdbb;border-radius:999px;padding:6px 10px;font-size:13px;background:#fff;cursor:pointer}
+.chip input{accent-color:var(--g)}
+.crit{border:1px solid var(--ln);border-radius:10px;padding:10px;margin:10px 0;background:#fff}
+.crit .t{font-weight:700;font-size:14px}
+.seg{display:flex;gap:6px;margin:8px 0}
+.seg label{flex:1;text-align:center;border:1px solid #cfc6b8;border-radius:8px;padding:8px 4px;font-size:13px;font-weight:600;cursor:pointer;background:#fff}
+.seg input{display:none}
+.seg input:checked+span{color:#fff}
+.seg label.on,.seg label:has(input:checked){background:var(--g);border-color:var(--g);color:#fff}
+.score{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:10px 12px;border-radius:10px;background:#f3eee6;margin:10px 0;font-size:14px}
+.pill{padding:4px 12px;border-radius:999px;font-weight:700;font-size:13px;color:#fff;background:#9a948b}
+.pill.Alta{background:var(--lo)}.pill.Media{background:var(--md)}.pill.Baja{background:var(--ok)}
+.err{color:var(--lo);font-size:12.5px;margin-top:3px;display:none}
+.inv .err{display:block}
+.inv input,.inv textarea,.inv select,.inv .seg,.inv .chips{outline:2px solid #e9b7b7;border-radius:9px}
+table.res{width:100%;border-collapse:collapse;font-size:13px}
+table.res th,table.res td{border:1px solid var(--ln);padding:6px 8px;text-align:left;vertical-align:top}
+table.res th{background:#f3eee6}
+.toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:#23201d;color:#fff;padding:10px 16px;border-radius:10px;font-size:13px;opacity:0;transition:.3s;pointer-events:none;z-index:9}
+.toast.on{opacity:.95}
+.ok-box{text-align:center;padding:26px 16px}
+.ok-box .folio{font-size:22px;font-weight:700;color:var(--g);letter-spacing:.5px;margin:8px 0}
+.saved{font-size:12px;color:var(--mu);text-align:right;margin-top:-6px}
+footer{font-size:11.5px;color:var(--mu);padding:8px 16px 24px;max-width:920px;margin:0 auto}
+.hide{display:none}
+.cons{border:1.5px solid var(--g);border-radius:10px;padding:10px 12px;margin:12px 0;background:#faf3f5;font-size:13.5px}
+.cons .ct{font-weight:700;color:var(--g)}
+.cons .cg{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin:8px 0}
+@media(max-width:520px){.cons .cg{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.cons .cg div{background:#fff;border:1px solid var(--ln);border-radius:8px;padding:6px 8px;font-size:12.5px}
+.cons .cg b{display:block;font-size:13.5px}
+.badge{display:inline-block;font-size:11.5px;font-weight:700;color:#5b4520;background:#f1e4cc;border-radius:999px;padding:3px 9px;margin-left:8px}
+.banner{background:#eef5ef;border:1px solid #c6dccb;color:#24543a;border-radius:10px;padding:10px 12px;font-size:13.5px;margin-bottom:12px}
+.sinb{display:flex;gap:8px;align-items:flex-start;background:#f6f1e8;border-radius:10px;padding:10px 12px;margin:8px 0;font-size:13.5px;cursor:pointer}
+.sinb input{margin-top:3px;accent-color:var(--g)}
+
+/* ===== Secciones ===== */
+.secbar{display:flex;align-items:center;gap:8px;margin-top:8px}
+.secnav{display:flex;gap:6px;overflow-x:auto;padding:4px 2px 6px;scrollbar-width:thin;flex:1}
+.secnav button{flex:none;min-width:38px;height:38px;border-radius:999px;border:2px solid #d8cdbb;background:#fff;color:var(--mu);font:inherit;font-weight:700;font-size:13px;cursor:pointer;padding:0 10px;transition:.2s;position:relative}
+.secnav button:hover{border-color:var(--o);transform:translateY(-1px)}
+.secnav button.mid{border-color:var(--md);color:#8a5a12;background:#fff7e8}
+.secnav button.ok{border-color:var(--ok);color:#fff;background:var(--ok)}
+.secnav button.on{box-shadow:0 0 0 3px rgba(107,29,51,.25);border-color:var(--g)}
+.secnav button.on:not(.ok){background:var(--g);color:#fff}
+.secinfo{font-size:12.5px;color:var(--g);font-weight:600;margin-top:2px}
+.leg{display:flex;gap:10px;font-size:11px;color:var(--mu);margin-top:2px;flex-wrap:wrap}
+.leg i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:4px;vertical-align:-1px}
+.bh{cursor:pointer;gap:8px;padding:2px 0}
+.bhl{display:flex;flex-wrap:wrap;align-items:center;gap:6px;min-width:0;flex:1}
+.chev{display:inline-block;transition:transform .25s;color:var(--g);font-size:12px}
+.brecha.open .chev{transform:rotate(90deg)}
+.bprev{flex-basis:100%;font-size:12.5px;color:var(--mu);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.brecha.open .bprev{display:none}
+.bst{font-size:11.5px;font-weight:700;border-radius:999px;padding:2px 9px;background:#f3eee6;color:var(--mu)}
+.bst.ok{background:#dff0e5;color:var(--ok)}
+.bbody{display:none}
+.brecha.open .bbody{display:block;animation:entra .3s ease}
+.brecha.ok:not(.open){border-style:solid;border-color:#bcd9c6;background:#f6fbf8}
+.bfoot{display:flex;justify-content:flex-end;margin-top:12px}
+@media(max-width:560px){
+ .steps{gap:4px}.steps div{font-size:11px;padding:6px 4px}
+ .steps div .ck{width:13px;height:13px;line-height:13px;font-size:9px}
+ #savedInfo,.leg{display:none}
+ .secnav button{min-width:34px;height:34px;font-size:12px}
+ .secinfo{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+ .top{padding-top:8px}
+}
+/* ===== Dinámica de la interfaz ===== */
+/* ===== Plantilla institucional (igual que ÁGORA) ===== */
+.greca{height:34px;background:#701631 repeat-x left center;background-size:auto 100%}
+header.topbar{display:block;background:#fff;color:var(--tx);padding:0;border-bottom:3px solid var(--o)}
+.wrapx{max-width:920px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.unit{text-align:right;line-height:1.3;font-size:13px;color:#4A3B3F}
+.unit b{display:block;color:var(--g);font-size:14px}
+.hero{background:var(--bg)}
+.hero .wrapx{display:block;padding:20px 16px 4px}
+.eyebrow{font-size:11.5px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--o)}
+.hero h1{font-family:"Noto Serif",Georgia,serif;color:var(--g);font-size:clamp(21px,4.2vw,30px);line-height:1.15;margin:4px 0 6px;font-weight:700;text-wrap:balance}
+.hero p{margin:0;color:var(--mu);font-size:14px}
+.card h2{font-family:"Noto Serif",Georgia,serif}
+footer.pie{background:#fff;border-top:3px solid var(--o);margin-top:24px;max-width:none;padding:0}
+footer.pie .wrapx{align-items:center;color:#4A3B3F;font-size:12.5px}
+footer.pie .wrapx>div{flex:1 1 380px;min-width:0}
+footer.pie b{color:var(--g)}
+footer.pie img{height:74px;width:auto}
+@media(max-width:560px){.unit{display:none}footer.pie img{height:60px}}
+@keyframes brillo{to{background-position:-200% 0}}
+.logos{display:flex;gap:10px;align-items:center;flex:none;min-height:40px}
+.logos img{height:52px;width:auto;max-width:100%}
+.logo-txt{font-family:"Noto Serif",Georgia,serif;font-weight:700;color:var(--g);font-size:18px}
+@media(max-width:560px){.logos img{height:42px}}
+.top{position:sticky;top:0;z-index:5;background:var(--bg);padding:10px 0 6px;margin:-14px 0 8px}
+.prog{height:6px;background:#e6ded1;border-radius:999px;overflow:hidden;margin-top:8px}
+.prog{height:8px}
+.prog i{display:block;height:100%;width:0;background:hsl(0,65%,46%);border-radius:999px;transition:width .5s cubic-bezier(.2,.8,.2,1),background-color .5s,box-shadow .5s;position:relative;overflow:hidden}
+.prog i::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.45),transparent);transform:translateX(-100%);animation:barrido 2.4s ease-in-out infinite}
+@keyframes barrido{to{transform:translateX(100%)}}
+.prog i.full{box-shadow:0 0 10px rgba(46,125,79,.6)}
+#progTxt b{transition:color .5s}
+.progtxt{display:flex;justify-content:space-between;font-size:11.5px;color:var(--mu);margin-top:4px}
+.steps{margin:0;position:relative}
+.steps div{position:relative;display:flex;align-items:center;justify-content:center;gap:6px;transition:background .35s,color .35s,transform .25s;cursor:default;user-select:none}
+.steps div.done{cursor:pointer}.steps div.done:hover{transform:translateY(-1px)}
+.steps div .ck{display:none;width:16px;height:16px;border-radius:50%;background:var(--g);color:#fff;font-size:11px;line-height:16px;text-align:center}
+.steps div.done .ck{display:inline-block;animation:pop .35s ease}
+.steps div.on{box-shadow:0 4px 14px rgba(107,29,51,.28)}
+@keyframes pop{0%{transform:scale(0)}70%{transform:scale(1.25)}100%{transform:scale(1)}}
+section.anim{animation:entra .38s cubic-bezier(.2,.8,.2,1)}
+section.anim.back{animation-name:entraIzq}
+@keyframes entra{from{opacity:0;transform:translateX(26px)}to{opacity:1;transform:none}}
+@keyframes entraIzq{from{opacity:0;transform:translateX(-26px)}to{opacity:1;transform:none}}
+.card{transition:box-shadow .25s,transform .25s}
+.card:hover{box-shadow:0 6px 22px rgba(60,30,20,.08)}
+.btn{position:relative;overflow:hidden;display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;transition:transform .15s,box-shadow .25s,background .25s,filter .2s;-webkit-tap-highlight-color:transparent}
+.btn:hover{transform:translateY(-2px)}
+.btn:active{transform:translateY(0) scale(.97)}
+.bp{background:linear-gradient(135deg,var(--g2),var(--g));box-shadow:0 4px 14px rgba(107,29,51,.30)}
+.bp:hover{box-shadow:0 8px 22px rgba(107,29,51,.38);filter:brightness(1.06)}
+.bp::before{content:"";position:absolute;top:0;left:-60%;width:40%;height:100%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.35),transparent);transform:skewX(-20deg);transition:left .6s}
+.bp:hover::before{left:120%}
+.bs:hover{background:#e2d8c8;box-shadow:0 4px 12px rgba(60,30,20,.12)}
+.bl:hover{background:#fbeaea;transform:none}
+.btn .ar{display:inline-block;transition:transform .25s}
+.btn:hover .ar{transform:translateX(4px)}.btn:hover .al{transform:translateX(-4px)}
+.btn:disabled{opacity:.75;cursor:wait;transform:none}
+.spin{width:16px;height:16px;border:2.5px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:gira .8s linear infinite}
+@keyframes gira{to{transform:rotate(360deg)}}
+.rip{position:absolute;border-radius:50%;transform:scale(0);background:currentColor;opacity:.22;pointer-events:none;animation:ripple .6s ease-out}
+@keyframes ripple{to{transform:scale(2.6);opacity:0}}
+.chip,.seg label,.fesp-opt,.sinb{position:relative;overflow:hidden;transition:transform .15s,border-color .2s,background .2s,box-shadow .2s}
+.chip:hover,.seg label:hover{transform:translateY(-1px);border-color:var(--o)}
+.chip:has(input:checked){background:#faf3f5;border-color:var(--g);color:var(--g);font-weight:600}
+.fesp-opt:hover{border-color:var(--o);box-shadow:0 4px 14px rgba(60,30,20,.08);transform:translateY(-1px)}
+.fesp-opt.sel{box-shadow:0 0 0 3px rgba(107,29,51,.12)}
+.fesp-opt.sel .num{animation:pop .35s ease}
+.seg label.on{animation:pop .3s ease}
+.brecha{animation:entra .35s ease}
+.pill{transition:background .3s,transform .3s}
+.score .pill.Alta,.score .pill.Media,.score .pill.Baja{animation:pop .35s ease}
+.nav{position:sticky;bottom:0;z-index:4;background:linear-gradient(180deg,rgba(246,243,238,0),var(--bg) 35%);padding:16px 0 12px;margin-top:8px}
+.fab{position:fixed;right:16px;bottom:84px;width:44px;height:44px;border-radius:50%;border:0;background:var(--g);color:#fff;font-size:20px;box-shadow:0 6px 18px rgba(107,29,51,.35);cursor:pointer;opacity:0;transform:translateY(12px);transition:.3s;pointer-events:none;z-index:6}
+.fab.on{opacity:1;transform:none;pointer-events:auto}
+.ok-ico{width:84px;height:84px;margin:0 auto 6px}
+.ok-ico circle{stroke:var(--ok);stroke-width:4;fill:none;stroke-dasharray:240;stroke-dashoffset:240;animation:traza .7s ease forwards}
+.ok-ico path{stroke:var(--ok);stroke-width:5;fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:60;stroke-dashoffset:60;animation:traza .45s .6s ease forwards}
+@keyframes traza{to{stroke-dashoffset:0}}
+.inv{animation:sacude .4s}
+@keyframes sacude{20%,60%{transform:translateX(-4px)}40%,80%{transform:translateX(4px)}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+#cargando{position:fixed;inset:0;z-index:50;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;padding:24px;color:var(--tx)}
+#cargando:empty{display:none}
+.spin2{width:42px;height:42px;border:4px solid #e6ded1;border-top-color:var(--g);border-radius:50%;animation:gira .9s linear infinite}
+</style>
+</head>
+<body>
+<div id="cargando"></div>
+<div class="greca" id="greca" role="presentation"></div>
+<header class="topbar">
+  <div class="wrapx">
+    <div class="logos" id="logos"></div>
+    <div class="unit"><b>Coordinación Estatal Morelos</b>Servicio Nacional de Salud Pública</div>
+  </div>
+</header>
+<section class="hero">
+  <div class="wrapx">
+    <div class="eyebrow">Estrategia paralela · Funciones Esenciales de Salud Pública</div>
+    <h1>Matriz del Plan de Acción para el Fortalecimiento de las FESP</h1>
+    <p>Máscara de captura para Jurisdicciones Sanitarias (Distritos de Salud para el Bienestar)</p>
+  </div>
+</section>
+<div id="demoBar" class="demo hide">Vista de demostración: los datos no se envían a ninguna base. En la versión publicada con Apps Script se registran en la hoja de concentración.</div>
+
+<div class="wrap">
+  <div class="top">
+    <div class="steps" id="steps"><div data-s="1"><span class="ck">✓</span>1 · Datos</div><div data-s="2"><span class="ck">✓</span>2 · FESP y brechas</div><div data-s="3"><span class="ck">✓</span>3 · Revisión y envío</div></div>
+    <div class="prog"><i id="progBar"></i></div>
+    <div class="progtxt"><span id="progTxt">Avance de captura: 0%</span><span id="savedInfo"></span></div>
+    <div id="secWrap" class="hide">
+      <div class="secbar"><div class="secnav" id="secNav"></div></div>
+      <div class="secinfo" id="secInfo"></div>
+      <div class="leg"><span><i style="background:#d8cdbb"></i>Pendiente</span><span><i style="background:var(--md)"></i>En proceso</span><span><i style="background:var(--ok)"></i>Completa</span></div>
+    </div>
+  </div>
+
+  <!-- PASO 1 -->
+  <section id="p1">
+    <div class="card">
+      <h2>Datos de identificación</h2>
+      <p class="hint">Registre los datos de la Jurisdicción Sanitaria para la cual se elabora el plan de acción y de la persona responsable de la captura.</p>
+      <div class="grid2">
+        <div data-f="entidad"><label class="f">Entidad federativa <span class="req">*</span></label>
+          <input type="text" id="entidad"><div class="err">Campo obligatorio.</div></div>
+        <div data-f="jurisdiccion"><label class="f">Jurisdicción Sanitaria <span class="req">*</span></label>
+          <select id="jurisdiccion"></select><div class="err">Seleccione la Jurisdicción Sanitaria.</div></div>
+      </div>
+      <div data-f="jurOtra" id="jurOtraBox" class="hide"><label class="f">Número y nombre oficial de la Jurisdicción <span class="req">*</span></label>
+        <input type="text" id="jurOtra" placeholder="Ej. Jurisdicción Sanitaria IV …"><div class="err">Campo obligatorio.</div></div>
+      <div class="grid2">
+        <div data-f="capturista"><label class="f">Nombre completo de quien captura <span class="req">*</span></label>
+          <input type="text" id="capturista"><div class="err">Campo obligatorio.</div></div>
+        <div data-f="cargo"><label class="f">Cargo / área <span class="req">*</span></label>
+          <input type="text" id="cargo"><div class="err">Campo obligatorio.</div></div>
+        <div data-f="correo"><label class="f">Correo institucional <span class="req">*</span></label>
+          <input type="email" id="correo"><div class="err">Ingrese un correo válido.</div></div>
+        <div data-f="telefono"><label class="f">Teléfono / extensión</label>
+          <input type="tel" id="telefono"></div>
+        <div data-f="fechaEval"><label class="f">Fecha de la sesión de análisis <span class="req">*</span></label>
+          <input type="date" id="fechaEval"><div class="err">Campo obligatorio.</div></div>
+        <div data-f="participantes"><label class="f">Personal participante en el análisis</label>
+          <input type="text" id="participantes" placeholder="Cargos o áreas que participaron"></div>
+      </div>
+    </div>
+    <div class="nav"><span></span><button class="btn bp" onclick="go(2)">Continuar <span class="ar">→</span></button></div>
+  </section>
+
+  <!-- PASO 2 -->
+  <section id="p2" class="hide">
+    <div id="precargaBanner" class="banner hide"></div>
+    <div class="card" id="selCard">
+      <h2>Seleccione las FESP a registrar</h2>
+      <p class="hint">Marque una o más funciones. Para cada una se abrirá el apartado para registrar las brechas identificadas y su plan de acción.</p>
+      <div id="fespList"></div>
+      <div class="err" id="fespErr">Seleccione al menos una FESP.</div>
+    </div>
+    <div id="fespBlocks"></div>
+    <div class="nav"><button class="btn bs" id="secPrev" onclick="secMove(-1)"><span class="ar al">←</span> Regresar</button><button class="btn bp" id="secNext" onclick="secMove(1)">Siguiente <span class="ar">→</span></button></div>
+  </section>
+
+  <!-- PASO 3 -->
+  <section id="p3" class="hide">
+    <div class="card">
+      <h2>Revisión antes del envío</h2>
+      <p class="hint">Verifique la información. Una vez enviada, se genera un folio de registro.</p>
+      <div id="resumen"></div>
+      <label class="chip" style="margin-top:12px;border-radius:10px"><input type="checkbox" id="conf"> Confirmo que la información fue validada con el personal de la Jurisdicción Sanitaria.</label>
+    </div>
+    <div class="nav"><button class="btn bs" onclick="go(2)"><span class="ar al">←</span> Regresar</button><button class="btn bp" id="btnEnviar" onclick="enviar()">Enviar registro <span class="ar">➤</span></button></div>
+  </section>
+
+  <!-- OK -->
+  <section id="p4" class="hide">
+    <div class="card ok-box">
+      <svg class="ok-ico" viewBox="0 0 84 84"><circle cx="42" cy="42" r="38"/><path d="M26 43 l11 11 l21 -23"/></svg>
+      <h2>Registro enviado</h2>
+      <p>Folio de registro:</p>
+      <div class="folio" id="folio"></div>
+      <p class="hint">Conserve este folio para cualquier aclaración con el nivel estatal.</p>
+      <button class="btn bp" onclick="nuevo()">Capturar otro registro</button>
+    </div>
+  </section>
+</div>
+<footer class="pie"><div class="wrapx"><div><b>SNSP · Coordinación Estatal Morelos.</b> Uso exclusivo de personal autorizado de las Jurisdicciones Sanitarias.<br>Fuentes: OPS (2024). Suplemento 3. Guía interina sobre la elaboración de un plan de acción para las funciones esenciales de salud pública (fase 3) (OPS/HSS/PH/24/0008) · OPS (2019). Las funciones esenciales de la salud pública en las Américas. Una renovación para el siglo XXI. Marco conceptual y descripción · OPS (2021). Marco de monitoreo para la salud universal en las Américas.</div><img id="emblema" alt="Emblema institucional 2026" class="hide"></div></footer>
+<div class="toast" id="toast"></div>
+<button class="fab" id="fab" aria-label="Volver arriba" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<script>
+let CATALOGO = [], CONFIG = {};
+const CATALOGO_DEMO = [{"n": 1, "area": "Evaluación", "corto": "Monitoreo y evaluación", "nombre": "Monitoreo y evaluación de la salud y el bienestar, la equidad, los determinantes sociales de la salud y el desempeño e impacto de los sistemas de salud", "desc": "Contiene las acciones que aseguran la disponibilidad, el análisis y el uso de información sobre el estado de salud y bienestar de la población, la equidad en relación con la salud, los determinantes sociales de la salud, la capacidad de respuesta del sistema de salud y las acciones de salud pública de tipo poblacional e individual. Esta función se orienta a fortalecer las capacidades de las autoridades de salud para implementar los procesos de monitoreo y evaluación, incluyendo el uso de tecnologías de la información, la administración de datos, la previsión y la configuración de escenarios, y el análisis y la utilización de esta información en los procesos de formulación de políticas para la salud y de planificación sectorial para responder a las necesidades de salud de la población.", "comp": ["Acción intersectorial", "Programas y estrategias prioritarias", "Gestión de la salud individual y colectiva"]}, {"n": 2, "area": "Evaluación", "corto": "Vigilancia, control y gestión de riesgos", "nombre": "La vigilancia en la salud pública: el control y la gestión de los riesgos para la salud y las emergencias", "desc": "Considera el fortalecimiento de las capacidades institucionales y de conducción de las autoridades de salud para garantizar una adecuada vigilancia, control, gestión y respuesta a los riesgos para la salud, incluyendo los brotes de enfermedades transmisibles, las emergencias y los factores de riesgo de las enfermedades no transmisibles, la salud mental y lesiones, entre otros temas.", "comp": ["Rectoría Operativa", "Uso de los sistemas de información", "Elaboración y uso local de canales endémicos", "Difusión de información epidemiológica", "Abordaje oportuno de brotes epidemiológicos", "Monitoreo de los niveles de cloro residual en agua"]}, {"n": 3, "area": "Evaluación", "corto": "Investigación y gestión del conocimiento", "nombre": "Promoción y gestión de la investigación y el conocimiento en el ámbito de la salud", "desc": "Comprende la producción de conocimiento científico y su integración al proceso de formulación de políticas de salud de las autoridades de salud para garantizar estas contribuciones fundamentales para el fortalecimiento de los sistemas de salud y la salud pública.", "comp": ["Desarrollo de investigación operativa", "Estimulación para la investigación de salud colectiva"]}, {"n": 4, "area": "Desarrollo de políticas", "corto": "Políticas, legislación y marcos regulatorios", "nombre": "Formulación e implementación de políticas de salud y promoción de legislación que proteja la salud de la población", "desc": "Comprende de forma integral dos componentes: el desarrollo de las capacidades de las autoridades de salud para formular e implementar políticas sectoriales que aborden los problemas de salud de la población y estén informadas por el mejor conocimiento disponible y relevante, y el fortalecimiento de su influencia sobre la producción de un cuerpo legislativo que defina una estructura institucional formal y regulatoria del sector de la salud.", "comp": ["Capacidad de operación de estrategias o políticas públicas en salud", "Análisis de las iniciativas de equidad en salud", "Integración de recursos humanos, materiales o culturales en procesos locales de salud", "Gestión territorial de la salud colectiva"]}, {"n": 5, "area": "Desarrollo de políticas", "corto": "Participación y movilización social", "nombre": "Participación y movilización social, inclusión de actores estratégicos y transparencia", "desc": "Esta función comprende la acción de actores sociales con capacidad, habilidad y oportunidad para identificar problemas y necesidades, definir prioridades y formular y negociar sus propuestas en el desarrollo de la salud, de una manera deliberada, democrática y concertada. La función abarca las acciones colectivas mediante las cuales la sociedad civil y la comunidad organizada intervienen e influyen directamente en la organización, el control, la gestión y la fiscalización de las instituciones y del sistema de salud en su conjunto.", "comp": ["Integración de otros sectores en la operación de estrategias o políticas de salud colectiva local", "Identificación y abordaje de brechas locales de salud colectiva", "Planes locales de salud y estrategias de participación social", "Identificación de líderes comunitarios", "Desarrollo de procesos de educación para la salud colectiva", "Integración de organizaciones en los planes locales de salud"]}, {"n": 6, "area": "Asignación de recursos", "corto": "Desarrollo de los recursos humanos para la salud", "nombre": "Desarrollo de los recursos humanos para la salud", "desc": "Incluye la ejecución de políticas, reglamentos e intervenciones relacionados con la capacitación, el empleo y las condiciones de trabajo, la movilidad interna y externa, y la reglamentación de la educación y la práctica profesional, así como la distribución de los recursos humanos para la salud pública. Aunque dichas acciones están bajo la rectoría de las autoridades de salud, la función también requiere acciones de planificación estratégica con capacidad técnica y política para elaborar e implementar intervenciones sinérgicas en sectores distintos al de la salud, cada uno de los cuales incluye a actores diversos con responsabilidades, objetivos e intereses específicos.", "comp": ["Atención de necesidades de capacitación para el personal de salud", "Colaboración para la capacitación y formación de profesionales de la salud"]}, {"n": 7, "area": "Asignación de recursos", "corto": "Medicamentos y otras tecnologías de salud", "nombre": "Asegurar el acceso y el uso racional de medicamentos y otras tecnologías sanitarias esenciales de calidad, seguras y eficaces", "desc": "Acceso equitativo a los medicamentos y otras tecnologías sanitarias es una prioridad mundial que fue acordada en el 2016 como parte de los ODS. A nivel regional, la resolución de la OPS sobre El acceso y uso racional de los medicamentos y otras tecnologías de alto costo (205) da cuenta de la importancia del acceso y el uso racional de medicamentos y otras tecnologías sanitarias y postula cómo los países pueden fortalecer la función de asegurar su acceso a través de diferentes opciones de política.", "comp": ["Uso de tecnologías de información en la operación de los planes de salud colectiva", "Análisis de las cadenas de suministros de insumos para la atención médica y la salud colectiva", "Almacenamiento de medicamentos e insumos médicos"]}, {"n": 8, "area": "Asignación de recursos", "corto": "Financiamiento de la salud", "nombre": "Financiamiento de la salud eficiente y equitativo", "desc": "Corresponde al abordaje de cada uno de los elementos del proceso de financiamiento del sector de la salud, cuya expresión más tangible para el ente rector, aunque no se reduce solo a ello, es el presupuesto sectorial. La inclusión de esta función permite dos contribuciones importantes. En primer lugar, esta FESP abarca las diferentes funciones del modelo de financiamiento del sistema de salud, con una perspectiva de integración de todas las acciones de salud pública, tanto individuales como colectivas, con el objetivo de mejorar la equidad y la eficiencia del sistema de salud. En segundo lugar, y de forma complementaria, esta FESP asume un papel facilitador de la realización de este abordaje integral de las FESP, como herramienta de financiamiento del conjunto de dichas FESP.", "comp": ["Diagnóstico situacional de profesionales para la atención médica y salud colectiva", "Definición de recursos a partir del análisis situacional", "Mejora de la infraestructura física para la atención médica y la salud colectiva", "Asignación de recursos para brechas de salud colectiva"]}, {"n": 9, "area": "Acceso", "corto": "Acceso a los servicios integrales y de salud", "nombre": "Acceso equitativo a servicios de salud integrales y de calidad", "desc": "Incluye las acciones para garantizar el acceso a servicios de salud pública integrales y de calidad, ampliados progresivamente, y coherentes con las necesidades de salud, las capacidades del sistema y el contexto nacional, a través de la organización y la gestión de servicios de salud centrados en la persona, con enfoque de riesgo familiar y comunitario, curso de vida, determinantes sociales de la salud y salud en todas las políticas.", "comp": ["Actualización del directorio sectorial de establecimientos de salud", "Gestión de la demanda de atención médica", "Mecanismos para garantizar el acceso a servicios de atención médica", "Evaluación del acceso integral a los servicios de salud colectiva", "Evaluación del acceso integral a los servicios de atención médica", "Acceso a servicios de salud colectiva en grupos vulnerables", "Evaluación de la calidad de los servicios de atención médica", "Operación de redes integradas de servicios de salud"]}, {"n": 10, "area": "Acceso", "corto": "Promoción de la salud y comportamientos saludables", "nombre": "Acceso equitativo a intervenciones que buscan promover la salud, reducir factores de riesgo y favorecer comportamientos saludables", "desc": "Contempla las acciones para garantizar el acceso al conjunto de intervenciones de salud pública cuyo objetivo es reducir la exposición a los factores de riesgo y favorecer los entornos saludables. Entre ellas se pueden mencionar las políticas de prevención de factores de riesgo de las enfermedades no transmisibles, como las políticas fiscales (por ejemplo, impuestos para el tabaco, el alcohol y las bebidas azucaradas), la regulación de la comercialización y la promoción de determinados productos (por ejemplo, la regulación o prohibición de la promoción del tabaco y el alcohol), las regulaciones de etiquetado (tabaco, alimentos), la promoción y la protección de la lactancia materna o la promoción de la actividad física y los ambientes libres de humo de tabaco. También se incluyen las políticas cuyo objetivo es el aseguramiento del saneamiento, el transporte seguro, el control vectorial, el control de la contaminación del aire, la inocuidad de los alimentos y la seguridad alimentaria, la seguridad química, la adaptación al cambio climático y la mitigación de sus efectos y la salud ambiental y la protección de la salud de los trabajadores.", "comp": ["Estrategia para la creación de entornos de salud y bienestar", "Desarrollo de procesos protectores a través de la promoción de la salud"]}, {"n": 11, "area": "Acceso", "corto": "Abordaje a los determinantes sociales de la salud", "nombre": "Gestión y promoción de las intervenciones sobre los determinantes sociales de la salud", "desc": "Abarca el conjunto de iniciativas intersectoriales que están enfocadas en abordar factores estructurales de tipo socioeconómico que afectan la salud, aunque gran parte de estos no se encuentren bajo el control directo del sector de la salud. Si bien el propio sistema de salud es un determinante importante, otros determinantes, como la calidad de la educación, la fortaleza del mercado laboral, la seguridad del ambiente laboral y la calidad de los vecindarios, deben ser abordados de forma intersectorial. El papel principal de las autoridades de salud para el ejercicio de esta función es actuar como socios en el desarrollo y la implementación de las iniciativas. En estos casos, se busca promover una gobernanza de salud en todas las políticas.", "comp": ["Modelo de resiliencia del sistema local de salud", "Estrategia para fortalecer la acción intersectorial en temas prioritarios de salud", "Análisis de los determinantes sociales de la salud"]}];
+const CONFIG_DEMO = {"entidad": "Morelos", "jurisdicciones": ["Jurisdicción Sanitaria I Cuernavaca", "Jurisdicción Sanitaria II Jojutla", "Jurisdicción Sanitaria III Cuautla"], "precarga": {"Jurisdicción Sanitaria III Cuautla": {"1": {"sinBrecha": false, "obs": "", "brechas": [{"hallazgo": "Aunque los municipios del DSB cuentan con un ASIS, no está analizado, no está priorizado y no tiene planes de trabajo", "componentes": []}, {"hallazgo": "PAEs: se evalúan con generación de acuerdos y compromisos pero no se da seguimiento.", "componentes": ["Programas y estrategias prioritarias"]}, {"hallazgo": "Se realiza evaluación de la efectividad de las intervenciones de políticas en materia de salud colectiva, pero solo el responsable de la estrategia.", "componentes": []}]}, "2": {"sinBrecha": false, "obs": "", "brechas": [{"hallazgo": "El equipo gerencial del DSB utiliza en la toma de decisiones, sistemas de información convencionales y especiales, pero fragmentados en temas", "componentes": ["Uso de los sistemas de información"]}, {"hallazgo": "No se realiza de manera semanal o mensual los canales endémicos de las enfermedades de interés epidemiológico en el DSB", "componentes": ["Elaboración y uso local de canales endémicos"]}, {"hallazgo": "Se tiene conocimiento de los brotes, se cuenta con un mecanismo para darle seguimiento, pero solo se queda en el área de Inteligencia (red negativa)", "componentes": ["Abordaje oportuno de brotes epidemiológicos", "Difusión de información epidemiológica"]}]}, "3": {"sinBrecha": false, "obs": "", "brechas": [{"hallazgo": "No se realiza estimulación a personal de salud del DSB para realizar investigación en materia de salud colectiva.", "componentes": ["Estimulación para la investigación de salud colectiva"]}, {"hallazgo": "Se realiza investigación en el DSB pero por instancias externas.", "componentes": ["Desarrollo de investigación operativa"]}]}, "4": {"sinBrecha": false, "obs": "", "brechas": [{"hallazgo": "Se identifican políticas públicas de salud colectiva, que el distrito de salud conoce e implementa y tiene identificados recursos económicos y humanos específicos para su desarrollo acorde al territorio en que se lleva, pero solo los otorgados por el nivel Estatal.", "componentes": ["Capacidad de operación de estrategias o políticas públicas en salud"]}, {"hallazgo": "El Distrito de Salud para el Bienestar cuenta con un registro de activos mapeados y se integran en los planes de actuación territorial, tanto en abordaje de daños a la salud, como acciones que generen salud y bienestar, sin fomentar acciones que fortalezcan o desarrollen nuevos activos.", "componentes": ["Integración de recursos humanos, materiales o culturales en procesos locales de salud"]}]}, "5": {"sinBrecha": false, "obs": "", "brechas": [{"hallazgo": "Se identifican mecanismos para convocar a otras instituciones del sector y se utilizan en la operación de políticas en salud, pero solo con el sector salud, no se consideran otros sectores", "componentes": ["Integración de otros sectores en la operación de estrategias o políticas de salud colectiva local"]}, {"hallazgo": "Se identifican líderes comunitarios en el Distrito de Salud para el Bienestar y se tiene un plan de formación y capacitación, pero solo en temas daños a la salud y desde una perspectiva positivista.", "componentes": ["Identificación de líderes comunitarios"]}, {"hallazgo": "Se identifican talleres o sesiones de Educación para la Salud, para la comunidad del territorio, pero solo en temas daños a la salud y desde una perspectiva positivista.", "componentes": ["Desarrollo de procesos de educación para la salud colectiva"]}, {"hallazgo": "No se tiene un registro de organizaciones o movimientos de la sociedad civil", "componentes": ["Integración de organizaciones en los planes locales de salud"]}]}, "6": {"sinBrecha": false, "obs": "", "brechas": [{"hallazgo": "No se evalúan las necesidades de capacitación de manera trimestral para el personal de salud en el DSB", "componentes": ["Atención de necesidades de capacitación para el personal de salud"]}]}, "7": {"sinBrecha": false, "obs": "", "brechas": [{"hallazgo": "El uso de las tecnologías de la información es funcional y tiene valor, existen problemas técnicos que necesitan mejoras. La experiencia es aceptable, pero no sobresaliente.", "componentes": ["Uso de tecnologías de información en la operación de los planes de salud colectiva"]}, {"hallazgo": "No se cuenta con una metodología para analizar las cadenas de suministros y logística de los insumos para la atención médica y salud colectiva en territorio del DSB.", "componentes": ["Análisis de las cadenas de suministros de insumos para la atención médica y la salud colectiva"]}, {"hallazgo": "Se identifican medicamentos/insumos que están próximos a caducar o mal almacenados en el DSB y NO cuentan con programación para la distribución eficiente.", "componentes": ["Almacenamiento de medicamentos e insumos médicos"]}]}, "8": {"sinBrecha": false, "obs": "", "brechas": [{"hallazgo": "Se cuenta con Diagnóstico situacional de profesionales de salud para la atención tanto de la salud colectiva, y del personal de las unidades de atención médica, pero solo del sector público.", "componentes": ["Diagnóstico situacional de profesionales para la atención médica y salud colectiva"]}, {"hallazgo": "El personal de las unidades del distrito, conocen el ASIS o Diagnóstico Municipal de Salud, pero no asignan o definen recursos para estrategias de actuación de sus principales problemas identificados", "componentes": ["Definición de recursos a partir del análisis situacional"]}, {"hallazgo": "Se conoce la cantidad, ubicación y condiciones de las unidades o infraestructura para la salud colectiva y la atención médica, pero solo del sector público.", "componentes": ["Mejora de la infraestructura física para la atención médica y la salud colectiva"]}, {"hallazgo": "Los DSB, identifican o cuantifican el recurso para incidir en las brechas de salud identificadas en su territorio y se realiza una asignación presupuestal tanto de nivel estatal, como de nivel local, pero solo por parte del sector salud, no de otros sectores.", "componentes": ["Asignación de recursos para brechas de salud colectiva"]}]}, "9": {"sinBrecha": false, "obs": "", "brechas": [{"hallazgo": "Se realiza evaluación del acceso a los servicios de salud colectiva, pero no en todo el sector", "componentes": ["Evaluación del acceso integral a los servicios de salud colectiva"]}, {"hallazgo": "Se realiza evaluación del acceso a los servicios de atención médica en todo el sector (incluyendo consultorios anexos a farmacia y de medicina tradicional), con plan de acciones correctivas y preventivas pero no se le da seguimiento al cumplimiento", "componentes": ["Evaluación del acceso integral a los servicios de atención médica"]}, {"hallazgo": "Se tiene un mecanismo distrital, que garantice el acceso a los servicios de atención médica pero no se utiliza en la toma de decisiones con todo el sector", "componentes": ["Mecanismos para garantizar el acceso a servicios de atención médica"]}, {"hallazgo": "Se tiene una metodología para evaluación del acceso a servicios de salud colectiva para población en condición de vulnerabilidad, pero no se aplica", "componentes": ["Acceso a servicios de salud colectiva en grupos vulnerables"]}, {"hallazgo": "Se aplica metodología que evalúa calidad de los servicios de atención medica que se otorgan considerando participación de la población pero solo para población sin derechohabiencia", "componentes": ["Evaluación de la calidad de los servicios de atención médica"]}]}, "10": {"sinBrecha": true, "obs": "Ninguna brecha, evaluación 100%, aunque se sugiere medir resultados (cambio de conducta) con líneas base/posintervención.", "brechas": []}, "11": {"sinBrecha": false, "obs": "", "brechas": [{"hallazgo": "El DSB cuenta con un modelo de resiliencia para trabajar de manera coordinada con el Sector Salud en su ámbito distrital de correspondencia, pero solo lo desarrolla con el sector público", "componentes": ["Modelo de resiliencia del sistema local de salud"]}, {"hallazgo": "No se tiene una estrategia distrital que evalúe, desarrolle y fortalezca la acción intersectorial en territorio", "componentes": ["Estrategia para fortalecer la acción intersectorial en temas prioritarios de salud"]}]}}}};
+const CRITERIOS = [
+ {k:'magnitud',t:'Magnitud',h:'Identifique qué grupos poblacionales, servicios, procesos o áreas de la Jurisdicción Sanitaria se ven afectados por la brecha. Describa qué tan extendida es la afectación y cuánto dificulta el cumplimiento de la FESP.'},
+ {k:'relevancia',t:'Relevancia (gravedad · trascendencia · severidad)',h:'Valore qué tan importante y urgente es atender la brecha. Considere el riesgo de que la situación continúe y la gravedad de las consecuencias a corto, mediano o largo plazo.'},
+ {k:'factibilidad',t:'Factibilidad',h:'Identifique los recursos necesarios para reducir la brecha y si la Jurisdicción cuenta con ellos o puede conseguirlos (presupuesto, personal, tecnología, recursos normativos, organizativos o administrativos).'},
+ {k:'viabilidad',t:'Viabilidad',h:'Valore si las acciones pueden llevarse a cabo en las condiciones actuales: atribuciones y capacidad de gestión de las autoridades, posibilidad de acuerdos con actores e instituciones y condiciones que facilitan o dificultan la ejecución.'}
+];
+const NIVELES=[['Alta',3],['Media',2],['Baja',1]];
+const TIPOS_REC=['Económicos','Humanos','Tecnológicos','Políticos','Organizacionales','Administrativos'];
+const IS_GAS = (typeof google!=='undefined' && google.script && google.script.run);
+const API_URL = (window.FESP_CONFIG && window.FESP_CONFIG.API_URL && !/PEGUE_AQUI/.test(window.FESP_CONFIG.API_URL)) ? window.FESP_CONFIG.API_URL : '';
+const LS_KEY='fesp_captura_borrador_v1';
+let seq=0;
+
+const $=id=>document.getElementById(id);
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function toast(m){const t=$('toast');t.textContent=m;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),2600)}
+function grado(p){if(!p)return '';return p>=9?'Alta':p>=5?'Media':'Baja'}
+
+/* ---------- init ---------- */
+function init(){
+  if(!IS_GAS && !API_URL) $('demoBar').classList.remove('hide');
+  const IMG=CONFIG.imagenes||{};
+  $('logos').innerHTML=IMG.logo?`<img src="${IMG.logo}" alt="Secretaría de Salud · Servicio Nacional de Salud Pública" onerror="this.parentNode.innerHTML='<span class=logo-txt>Salud · SNSP</span>'">`:'<span class="logo-txt">Salud · SNSP</span>';
+  if(IMG.greca) $('greca').style.backgroundImage=`url("${IMG.greca}")`;
+  if(IMG.emblema){const em=$('emblema');em.onerror=()=>em.remove();em.src=IMG.emblema;em.classList.remove('hide')}
+  document.addEventListener('pointerdown',ripple);
+  window.addEventListener('scroll',()=>$('fab').classList.toggle('on',window.scrollY>600),{passive:true});
+  $('secNav').addEventListener('click',e=>{const b=e.target.closest('button[data-i]');if(b){const i=+b.dataset.i;showSec(i,i<sec)}});
+  $('steps').addEventListener('click',e=>{const d=e.target.closest('div[data-s]');if(d&&d.classList.contains('done')&&cur<4)go(+d.dataset.s)});
+  document.addEventListener('input',progreso);document.addEventListener('change',progreso);
+  $('entidad').value=CONFIG.entidad||'';
+  const sj=$('jurisdiccion');
+  sj.innerHTML='<option value="">— Seleccione —</option>'+CONFIG.jurisdicciones.map(j=>`<option>${esc(j)}</option>`).join('')+'<option value="__otra">Otra (especifique)</option>';
+  sj.onchange=()=>$('jurOtraBox').classList.toggle('hide',sj.value!=='__otra');
+  let html='',last='';
+  CATALOGO.forEach(f=>{
+    if(f.area!==last){html+=`<div class="area">${esc(f.area)}</div>`;last=f.area}
+    html+=`<label class="fesp-opt" id="opt${f.n}"><input type="checkbox" value="${f.n}" onchange="toggleFesp(${f.n},this.checked)"><span class="num">${f.n}</span><span><b>${esc(f.corto)}</b><br><span class="hint" style="margin:0">${esc(f.nombre)}</span></span></label>`;
+  });
+  $('fespList').innerHTML=html;
+  document.addEventListener('input',autosave);
+  document.addEventListener('change',autosave);
+  restore();
+  paintSteps(1);progreso();
+}
+function ripple(e){
+  const t=e.target.closest('.btn,.chip,.seg label,.fesp-opt,.sinb');if(!t||t.disabled)return;
+  const r=t.getBoundingClientRect(),d=Math.max(r.width,r.height),sp=document.createElement('span');
+  sp.className='rip';sp.style.cssText=`width:${d}px;height:${d}px;left:${e.clientX-r.left-d/2}px;top:${e.clientY-r.top-d/2}px`;
+  t.appendChild(sp);setTimeout(()=>sp.remove(),650);
+}
+let progT;
+function progreso(){clearTimeout(progT);progT=setTimeout(()=>{
+  const p=payload(),i=p.ident;let tot=6,ok=0;
+  [i.entidad,i.jurisdiccion,i.capturista,i.cargo,i.correo,i.fechaEval].forEach(v=>{if(v)ok++});
+  p.fesp.forEach(f=>{
+    if(f.sinBrecha){tot++;if(f.obs)ok++;return}
+    f.brechas.forEach(b=>{
+      const it=[b.componentes.length,b.hallazgo,b.justificacion,b.objetivo,b.estrategias,b.responsables,b.inicio,b.fin,b.recTipos.length]
+        .concat(CRITERIOS.map(c=>b.crit[c.k].nivel&&b.crit[c.k].desc));
+      tot+=it.length;ok+=it.filter(Boolean).length;
+    });
+  });
+  if(!p.fesp.length)tot+=15;
+  const pc=Math.round(ok/tot*100),hue=Math.round(pc*1.3),col=`hsl(${hue},${pc>=100?55:68}%,${pc>=100?36:44}%)`;
+  const bar=$('progBar');bar.style.width=pc+'%';bar.style.backgroundColor=col;bar.classList.toggle('full',pc>=100);
+  $('progTxt').innerHTML=pc>=100?`<b style="color:${col}">✓ Captura completa: 100%</b>`:`Avance de captura: <b style="color:${col}">${pc}%</b>`;
+  if(cur===2){estadosBrecha();renderNav()}
+},150)}
+
+/* ---------- FESP blocks ---------- */
+function toggleFesp(n,on,opt){
+  $('opt'+n).classList.toggle('sel',on);
+  const id='fb'+n;
+  if(on && !$(id)){
+    const f=CATALOGO.find(x=>x.n===n);
+    const d=document.createElement('div');d.className='card';d.id=id;d.dataset.n=n;
+    d.innerHTML=`<h2><span class="num">${n}</span>${esc(f.corto)}</h2>
+      <p class="hint">${esc(f.nombre)}</p>
+      <details class="info"><summary>Descripción y componentes de la FESP</summary><p>${esc(f.desc)}</p><b style="font-size:13px">Principales componentes:</b><ul>${f.comp.map(c=>`<li>${esc(c)}</li>`).join('')}</ul></details>
+      <label class="sinb"><input type="checkbox" class="sb" onchange="toggleSinBrecha(${n})"><span><b>No se identificaron brechas en esta FESP</b><br><span class="hint" style="margin:0">Marque solo si la evaluación no arrojó brechas. Registre sus observaciones o áreas de mejora.</span></span></label>
+      <div class="sbBox hide" data-f="obs"><label class="f">Observaciones / áreas de mejora <span class="req">*</span></label><textarea class="obs"></textarea><div class="err">Registre la observación.</div></div>
+      <div class="bwrap"><div class="brechas"></div>
+      <button class="btn bs" type="button" onclick="addBrecha(${n})">+ Agregar brecha</button>
+      <div class="cons"></div></div>`;
+    const cont=$('fespBlocks');
+    const after=[...cont.children].find(c=>+c.dataset.n>n);
+    cont.insertBefore(d,after||null);
+    if(!opt||!opt.empty) addBrecha(n);
+  } else if(!on && $(id)){
+    if(confirmLoss(id)) $(id).remove(); else {$('opt'+n).querySelector('input').checked=true;$('opt'+n).classList.add('sel')}
+  }
+  if($('secWrap')){if(cur===2&&sec===0)bloques().forEach(b=>b.classList.add('hide'));renderNav()}
+  autosave();
+}
+/* ---------- secciones ---------- */
+let sec=0;
+function bloques(){return [...$('fespBlocks').children]}
+function brechaOk(el){
+  const d=readBrecha(el);
+  const it=[d.componentes.length,d.hallazgo,d.justificacion,d.objetivo,d.estrategias,d.responsables,d.inicio,d.fin&&(!d.inicio||d.fin>=d.inicio),d.recTipos.length]
+    .concat(CRITERIOS.map(c=>d.crit[c.k].nivel&&d.crit[c.k].desc));
+  return {ok:it.filter(Boolean).length,tot:it.length};
+}
+function estadoFesp(b){
+  if(b.querySelector('.sb').checked) return b.querySelector('.obs').value.trim()?'ok':'mid';
+  const st=[...b.querySelectorAll('.brecha')].map(brechaOk);
+  if(st.length&&st.every(x=>x.ok===x.tot))return 'ok';
+  return st.some(x=>x.ok>2)?'mid':'';
+}
+function renderNav(){
+  const bl=bloques();if(sec>bl.length)sec=bl.length;
+  $('secNav').innerHTML=`<button type="button" data-i="0" title="Selección de FESP">☰</button>`+
+    bl.map((b,i)=>`<button type="button" data-i="${i+1}" class="${estadoFesp(b)}" title="FESP ${b.dataset.n}">${b.dataset.n}</button>`).join('');
+  [...$('secNav').children].forEach(x=>x.classList.toggle('on',+x.dataset.i===sec));
+  const on=$('secNav').querySelector('.on');if(on&&on.scrollIntoView)on.scrollIntoView({block:'nearest',inline:'center'});
+}
+function showSec(i,atras){
+  const bl=bloques();sec=Math.max(0,Math.min(i,bl.length));
+  $('selCard').classList.toggle('hide',sec!==0);
+  bl.forEach((b,k)=>b.classList.toggle('hide',k+1!==sec));
+  $('precargaBanner').style.display=sec<=1?'':'none';
+  const tgt=sec===0?$('selCard'):bl[sec-1];
+  tgt.classList.remove('anim','back');void tgt.offsetWidth;tgt.classList.add('anim');if(atras)tgt.classList.add('back');
+  if(sec>0){const b=bl[sec-1];const c=CATALOGO.find(x=>x.n===+b.dataset.n);
+    $('secInfo').textContent=`Sección ${sec} de ${bl.length} · FESP ${c.n}: ${c.corto}`;
+    if(!b.querySelector('.brecha.open')){const f=[...b.querySelectorAll('.brecha')].find(e=>{const s=brechaOk(e);return s.ok<s.tot})||b.querySelector('.brecha');if(f)f.classList.add('open')}
+  } else $('secInfo').textContent='Selección de las FESP a registrar';
+  $('secPrev').innerHTML=sec===0?'<span class="ar al">←</span> Regresar':'<span class="ar al">←</span> Anterior';
+  $('secNext').innerHTML=sec>=bl.length?'Revisar <span class="ar">→</span>':(sec===0?'Comenzar captura':'Siguiente FESP')+' <span class="ar">→</span>';
+  renderNav();estadosBrecha();window.scrollTo({top:0,behavior:'smooth'});
+}
+function secMove(d){
+  const bl=bloques();
+  if(d<0){if(sec===0)go(1);else showSec(sec-1,true);return}
+  if(sec===0&&!bl.length){$('fespErr').style.display='block';toast('Seleccione al menos una FESP.');return}
+  if(sec>=bl.length){go(3);return}
+  showSec(sec+1);
+}
+function toggleAcc(e,u){
+  if(e.target.closest('button'))return;
+  const el=$(u),abrir=!el.classList.contains('open');
+  el.parentElement.querySelectorAll('.brecha.open').forEach(x=>x.classList.remove('open'));
+  if(abrir){el.classList.add('open');setTimeout(()=>el.scrollIntoView({behavior:'smooth',block:'start'}),60)}
+}
+function sigHallazgo(u){
+  const el=$(u),s=brechaOk(el);
+  if(s.ok<s.tot) toast(`Este hallazgo tiene ${s.tot-s.ok} campo(s) pendiente(s); puede completarlo después.`);
+  el.classList.remove('open');
+  const nx=el.nextElementSibling;
+  if(nx){nx.classList.add('open');setTimeout(()=>nx.scrollIntoView({behavior:'smooth',block:'start'}),60)}
+  else{toast('Último hallazgo de esta FESP. Continúe con la siguiente sección.');$('secNext').focus()}
+  estadosBrecha();renderNav();
+}
+function estadosBrecha(){
+  document.querySelectorAll('.brecha').forEach(el=>{
+    const s=brechaOk(el),ok=s.ok===s.tot,t=el.querySelector('.bst');
+    el.classList.toggle('ok',ok);t.className='bst'+(ok?' ok':'');t.textContent=ok?'✓ Completo':`${s.ok}/${s.tot} campos`;
+    const h=el.querySelector(`[name="${el.id}_hallazgo"]`).value.trim();el.querySelector('.bprev').textContent=h||'Sin descripción';
+  });
+}
+function toggleSinBrecha(n){
+  const fb=$('fb'+n),on=fb.querySelector('.sb').checked;
+  fb.querySelector('.sbBox').classList.toggle('hide',!on);
+  fb.querySelector('.bwrap').classList.toggle('hide',on);
+  if(!on&&!fb.querySelector('.brecha'))addBrecha(n);
+}
+function setSinBrecha(n,obs){const fb=$('fb'+n);fb.querySelector('.sb').checked=true;fb.querySelector('.obs').value=obs||'';toggleSinBrecha(n)}
+function confirmLoss(id){
+  const has=[...$(id).querySelectorAll('textarea')].some(t=>t.value.trim());
+  return !has || window.confirm('Se eliminará la información capturada en esta FESP. ¿Desea continuar?');
+}
+function addBrecha(n,data){
+  const f=CATALOGO.find(x=>x.n===n);
+  const box=$('fb'+n).querySelector('.brechas');
+  const u='b'+(++seq);
+  const el=document.createElement('div');el.className='brecha';el.id=u;
+  if(data&&data.hallOrig) el.dataset.orig=data.hallOrig;
+  el.innerHTML=`
+   <div class="bh" onclick="toggleAcc(event,'${u}')"><span class="bhl"><span class="chev">▶</span><b class="bt"></b>${data&&data.hallOrig?'<span class="badge">Precargado</span>':''}<span class="bst">Pendiente</span><span class="bprev"></span></span><button type="button" class="btn bl" onclick="delBrecha('${u}')">Eliminar</button></div>
+   <div class="bbody">
+   <div data-f="comp"><label class="f">Componente(s) de la FESP relacionados <span class="req">*</span></label>
+     <div class="chips">${f.comp.map(c=>`<label class="chip"><input type="checkbox" name="${u}_comp" value="${esc(c)}">${esc(c)}</label>`).join('')}</div>
+     <div class="err">Seleccione al menos un componente.</div></div>
+   <div data-f="hallazgo"><label class="f">Hallazgo / brecha identificada <span class="req">*</span></label>
+     <p class="hint">Describa brevemente la brecha identificada en la evaluación de la FESP.</p>
+     <textarea name="${u}_hallazgo"></textarea><div class="err">Campo obligatorio.</div></div>
+   <h3>Criterios de priorización</h3>
+   <p class="hint">Para cada criterio seleccione una sola categoría, de acuerdo con el análisis realizado con el personal de la Jurisdicción.</p>
+   ${CRITERIOS.map(c=>`<div class="crit" data-f="crit_${c.k}">
+      <div class="t">${c.t}</div><div class="hint">${c.h}</div>
+      <div class="seg">${NIVELES.map(([l,v])=>`<label><input type="radio" name="${u}_${c.k}_nivel" value="${l}" onchange="calc('${u}')">${l} (${v})</label>`).join('')}</div>
+      <textarea name="${u}_${c.k}_desc" placeholder="Análisis del criterio" style="min-height:64px"></textarea>
+      <div class="err">Seleccione la categoría y describa el análisis.</div></div>`).join('')}
+   <div class="score"><span>Puntaje total: <b class="pt">—</b> / 12</span><span>Grado de priorización final:</span><span class="pill gr">—</span>
+     <span class="hint" style="margin:0">Baja 1–4 · Media 5–8 · Alta 9–12</span></div>
+   <div data-f="justificacion"><label class="f">Justificación <span class="req">*</span></label>
+     <p class="hint">Explique brevemente por qué se asignó una valoración alta, media o baja a cada criterio.</p>
+     <textarea name="${u}_justificacion"></textarea><div class="err">Campo obligatorio.</div></div>
+   <h3>Plan de acción</h3>
+   <div data-f="objetivo"><label class="f">Objetivo · ¿Qué? <span class="req">*</span></label>
+     <p class="hint">Objetivos específicos y medibles que respondan directamente a la brecha y puedan alcanzarse con los recursos disponibles.</p>
+     <textarea name="${u}_objetivo"></textarea><div class="err">Campo obligatorio.</div></div>
+   <div data-f="estrategias"><label class="f">Estrategias · ¿Cómo? <span class="req">*</span></label>
+     <p class="hint">Intervenciones, actividades o tareas y cómo contribuirán a reducir la brecha.</p>
+     <textarea name="${u}_estrategias"></textarea><div class="err">Campo obligatorio.</div></div>
+   <div data-f="responsables"><label class="f">Responsables · ¿Quién? <span class="req">*</span></label>
+     <p class="hint">Cargo o equipo responsable, área o institución y unidad o localidad donde opera. Si participan varias instancias, indique qué corresponde a cada una.</p>
+     <textarea name="${u}_responsables"></textarea><div class="err">Campo obligatorio.</div></div>
+   <div data-f="alianzas"><label class="f">Alianzas necesarias</label>
+     <p class="hint">Actores o instituciones con quienes se requieren acuerdos, qué apoyo se necesita y para qué actividad.</p>
+     <textarea name="${u}_alianzas"></textarea></div>
+   <div class="grid2">
+     <div data-f="inicio"><label class="f">Fecha de inicio <span class="req">*</span></label><input type="date" name="${u}_inicio"><div class="err">Indique la fecha.</div></div>
+     <div data-f="fin"><label class="f">Fecha prevista de conclusión <span class="req">*</span></label><input type="date" name="${u}_fin"><div class="err">Debe ser igual o posterior al inicio.</div></div>
+   </div>
+   <div data-f="recTipos"><label class="f">Tipo de recursos requeridos <span class="req">*</span></label>
+     <div class="chips">${TIPOS_REC.map(t=>`<label class="chip"><input type="checkbox" name="${u}_recTipos" value="${t}">${t}</label>`).join('')}</div>
+     <div class="err">Seleccione al menos un tipo.</div></div>
+   <div class="grid2">
+     <div data-f="recDisp"><label class="f">Recursos disponibles</label><textarea name="${u}_recDisp" style="min-height:64px"></textarea></div>
+     <div data-f="recGest"><label class="f">Recursos por gestionar y fuente</label><textarea name="${u}_recGest" style="min-height:64px"></textarea></div>
+   </div>
+   <div class="bfoot"><button type="button" class="btn bs" onclick="sigHallazgo('${u}')">Listo, siguiente hallazgo <span class="ar">↓</span></button></div>
+   </div>`;
+  box.appendChild(el);
+  if(!data) el.classList.add('open');
+  if(data) fillBrecha(u,data);
+  renumber(n);calc(u);progreso();
+  return u;
+}
+function delBrecha(u){
+  const el=$(u),fb=el.closest('[data-n]'),n=+fb.dataset.n;
+  if(fb.querySelectorAll('.brecha').length===1){toast('Cada FESP seleccionada requiere al menos una brecha.');return}
+  if([...el.querySelectorAll('textarea')].some(t=>t.value.trim()) && !window.confirm('¿Eliminar esta brecha?'))return;
+  el.remove();renumber(n);calcFesp(n);progreso();autosave();
+}
+function renumber(n){$('fb'+n).querySelectorAll('.brecha').forEach((b,i)=>b.querySelector('.bt').textContent='Brecha '+(i+1))}
+function calc(u){
+  const el=$(u);let p=0,all=true;
+  el.querySelectorAll('.seg label').forEach(l=>l.classList.toggle('on',l.querySelector('input').checked));
+  CRITERIOS.forEach(c=>{const r=el.querySelector(`input[name="${u}_${c.k}_nivel"]:checked`);if(r)p+=NIVELES.find(x=>x[0]===r.value)[1];else all=false});
+  el.querySelector('.pt').textContent=all?p:(p?p+' (incompleto)':'—');
+  const g=all?grado(p):'';const pl=el.querySelector('.gr');pl.textContent=g||'—';pl.className='pill gr '+g;
+  const fb=el.closest('[data-n]');if(fb)calcFesp(+fb.dataset.n);
+}
+function calcFesp(n){
+  const fb=$('fb'+n);if(!fb)return;const box=fb.querySelector('.cons'),bs=[...fb.querySelectorAll('.brecha')];
+  const NOM=['','Baja','Media','Alta'];let tot=0,comp=true;
+  const cells=CRITERIOS.map(c=>{
+    const v=bs.map(b=>{const r=b.querySelector(`input[name="${b.id}_${c.k}_nivel"]:checked`);return r?NIVELES.find(x=>x[0]===r.value)[1]:0});
+    if(!v.length||v.some(x=>!x)){comp=false;return `<div>${c.t.split(' ')[0]}<b>—</b></div>`}
+    const m=Math.min(3,Math.max(1,Math.round(v.reduce((a,x)=>a+x,0)/v.length)));tot+=m;
+    return `<div>${c.t.split(' ')[0]}<b>${NOM[m]} (${m})</b></div>`});
+  const g=comp?grado(tot):'';
+  box.innerHTML=`<div class="ct">Priorización consolidada de la FESP · se registra en la matriz oficial</div>
+   <div class="hint" style="margin:2px 0 0">Promedio redondeado de ${bs.length} hallazgo(s) por criterio. La priorización individual de cada hallazgo se conserva en la pestaña “Detalle por hallazgo”.</div>
+   <div class="cg">${cells.join('')}</div>
+   <div>Puntaje: <b>${comp?tot:'—'}</b> / 12 · Grado: <span class="pill ${g}">${g||'Pendiente'}</span></div>`;
+}
+
+/* ---------- data ---------- */
+function readBrecha(el){
+  const u=el.id,v=nm=>{const x=el.querySelector(`[name="${u}_${nm}"]`);return x?x.value.trim():''};
+  const checks=nm=>[...el.querySelectorAll(`input[name="${u}_${nm}"]:checked`)].map(x=>x.value);
+  const crit={};
+  CRITERIOS.forEach(c=>{const r=el.querySelector(`input[name="${u}_${c.k}_nivel"]:checked`);crit[c.k]={nivel:r?r.value:'',desc:v(c.k+'_desc')}});
+  const orig=el.dataset.orig||'';
+  const origen=!orig?'Capturado por la Jurisdicción':(v('hallazgo')===orig?'Precargado de la evaluación':'Precargado y modificado');
+  return {hallOrig:orig,origen,componentes:checks('comp'),hallazgo:v('hallazgo'),crit,justificacion:v('justificacion'),objetivo:v('objetivo'),estrategias:v('estrategias'),responsables:v('responsables'),alianzas:v('alianzas'),inicio:v('inicio'),fin:v('fin'),recTipos:checks('recTipos'),recDisponibles:v('recDisp'),recGestionar:v('recGest')};
+}
+function fillBrecha(u,d){
+  const el=$(u),set=(nm,val)=>{const x=el.querySelector(`[name="${u}_${nm}"]`);if(x)x.value=val||''};
+  (d.componentes||[]).forEach(c=>{el.querySelectorAll(`input[name="${u}_comp"]`).forEach(x=>{if(x.value===c)x.checked=true})});
+  (d.recTipos||[]).forEach(c=>{el.querySelectorAll(`input[name="${u}_recTipos"]`).forEach(x=>{if(x.value===c)x.checked=true})});
+  ['hallazgo','justificacion','objetivo','estrategias','responsables','alianzas','inicio','fin'].forEach(k=>set(k,d[k]));
+  set('recDisp',d.recDisponibles);set('recGest',d.recGestionar);
+  CRITERIOS.forEach(c=>{const cd=(d.crit||{})[c.k]||{};set(c.k+'_desc',cd.desc);if(cd.nivel){const r=el.querySelector(`input[name="${u}_${c.k}_nivel"][value="${cd.nivel}"]`);if(r)r.checked=true}});
+}
+function payload(){
+  const sj=$('jurisdiccion').value;
+  return {
+    ident:{entidad:$('entidad').value.trim(),jurisdiccion:sj==='__otra'?$('jurOtra').value.trim():sj,jurSel:sj,jurOtra:$('jurOtra').value.trim(),capturista:$('capturista').value.trim(),cargo:$('cargo').value.trim(),correo:$('correo').value.trim(),telefono:$('telefono').value.trim(),fechaEval:$('fechaEval').value,participantes:$('participantes').value.trim()},
+    fesp:[...$('fespBlocks').children].map(b=>{const sb=b.querySelector('.sb').checked;return {n:+b.dataset.n,sinBrecha:sb,obs:b.querySelector('.obs').value.trim(),brechas:sb?[]:[...b.querySelectorAll('.brecha')].map(readBrecha)}})
+  };
+}
+
+/* ---------- validation ---------- */
+function mark(box,bad){if(box)box.classList.toggle('inv',!!bad);return !bad}
+function val1(){
+  let ok=true;const p=payload().ident;
+  ok&=mark(document.querySelector('[data-f=entidad]'),!p.entidad);
+  ok&=mark(document.querySelector('[data-f=jurisdiccion]'),!p.jurSel);
+  if(p.jurSel==='__otra') ok&=mark(document.querySelector('[data-f=jurOtra]'),!p.jurOtra);
+  ok&=mark(document.querySelector('[data-f=capturista]'),!p.capturista);
+  ok&=mark(document.querySelector('[data-f=cargo]'),!p.cargo);
+  ok&=mark(document.querySelector('[data-f=correo]'),!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(p.correo));
+  ok&=mark(document.querySelector('[data-f=fechaEval]'),!p.fechaEval);
+  return !!ok;
+}
+function val2(){
+  let ok=true;const blocks=[...$('fespBlocks').children];
+  $('fespErr').style.display=blocks.length?'none':'block';if(!blocks.length)return false;
+  blocks.forEach(b=>{if(b.querySelector('.sb').checked){ok&=mark(b.querySelector('[data-f=obs]'),!b.querySelector('.obs').value.trim());return}
+   b.querySelectorAll('.brecha').forEach(el=>{
+    const d=readBrecha(el),q=k=>el.querySelector(`[data-f=${k}]`);
+    ok&=mark(q('comp'),!d.componentes.length);
+    ['hallazgo','justificacion','objetivo','estrategias','responsables','inicio'].forEach(k=>ok&=mark(q(k),!d[k]));
+    ok&=mark(q('fin'),!d.fin||(d.inicio&&d.fin<d.inicio));
+    ok&=mark(q('recTipos'),!d.recTipos.length);
+    CRITERIOS.forEach(c=>ok&=mark(q('crit_'+c.k),!d.crit[c.k].nivel||!d.crit[c.k].desc));
+  })});
+  return !!ok;
+}
+
+/* ---------- navigation ---------- */
+let cur=1;
+function paintSteps(n){[...$('steps').children].forEach((s,i)=>{s.className=i+1===n?'on':(i+1<n?'done':'')})}
+function animar(id,atras){const el=$(id);el.classList.remove('anim','back');void el.offsetWidth;el.classList.add('anim');if(atras)el.classList.add('back')}
+function go(n){
+  if(n>cur){
+    if(cur===1&&!val1()){toast('Revise los campos marcados.');return}
+    if(n===3&&!val2()){
+      const e=document.querySelector('#fespBlocks .inv');
+      if(e){const b=e.closest('#fespBlocks > .card'),i=bloques().indexOf(b)+1;showSec(i);const br=e.closest('.brecha');
+        if(br){br.parentElement.querySelectorAll('.brecha.open').forEach(x=>x.classList.remove('open'));br.classList.add('open')}
+        const c=CATALOGO.find(x=>x.n===+b.dataset.n);toast(`Faltan campos en la FESP ${c.n}. Se abrió la sección para completarlos.`);
+        setTimeout(()=>e.scrollIntoView({behavior:'smooth',block:'center'}),350);}
+      else toast('Seleccione al menos una FESP.');
+      return}
+  }
+  if(n===2&&cur===1) aplicarPrecarga();
+  $('secWrap').classList.toggle('hide',n!==2);
+  if(n===3) buildResumen();
+  ['p1','p2','p3','p4'].forEach((p,i)=>$(p).classList.toggle('hide',i+1!==n));
+  animar('p'+n,n<cur);
+  const prev=cur;cur=n;paintSteps(n);progreso();window.scrollTo({top:0,behavior:'smooth'});
+  if(n===2) showSec(prev===1?(bloques().length&&$('precargaBanner').textContent&&!$('precargaBanner').classList.contains('hide')?1:sec):sec,prev>2);
+}
+function aplicarPrecarga(){
+  const jur=payload().ident.jurisdiccion,pre=(CONFIG.precarga||{})[jur],bn=$('precargaBanner');
+  if(!pre){bn.classList.add('hide');return}
+  if($('fespBlocks').children.length){return}
+  let nb=0;
+  Object.keys(pre).map(Number).sort((a,b)=>a-b).forEach(n=>{
+    const f=pre[n],o=$('opt'+n);if(!o)return;
+    o.querySelector('input').checked=true;o.classList.add('sel');
+    toggleFesp(n,true,{empty:true});
+    if(f.sinBrecha){setSinBrecha(n,f.obs)}
+    else f.brechas.forEach(b=>{addBrecha(n,{hallazgo:b.hallazgo,hallOrig:b.hallazgo,componentes:b.componentes});nb++});
+  });
+  bn.innerHTML=`<b>Se precargaron ${nb} hallazgos de la evaluación FESP de ${esc(jur)}.</b><br>Revise cada hallazgo, confirme los componentes relacionados y complete la priorización y el plan de acción. Puede editar, eliminar o agregar brechas.`;
+  bn.classList.remove('hide');autosave();
+}
+function buildResumen(){
+  const p=payload(),i=p.ident;let rows='';
+  p.fesp.forEach(f=>{const c=CATALOGO.find(x=>x.n===f.n);
+    if(f.sinBrecha) rows+=`<tr><td>${f.n}. ${esc(c.corto)}</td><td>—</td><td>${esc(f.obs.slice(0,140))}</td><td>—</td><td><span class="pill">Sin brecha</span></td><td>—</td></tr>`;
+    f.brechas.forEach((b,k)=>{
+    const pt=CRITERIOS.reduce((s,cr)=>s+(NIVELES.find(x=>x[0]===b.crit[cr.k].nivel)||[0,0])[1],0),g=grado(pt);
+    rows+=`<tr><td>${f.n}. ${esc(c.corto)}</td><td>${k+1}</td><td>${esc(b.hallazgo.slice(0,140))}${b.hallazgo.length>140?'…':''}</td><td>${pt}</td><td><span class="pill ${g}">${g}</span></td><td>${esc(b.inicio)} → ${esc(b.fin)}</td></tr>`})});
+  $('resumen').innerHTML=`<p><b>${esc(i.jurisdiccion)}</b> · ${esc(i.entidad)}<br><span class="hint">Captura: ${esc(i.capturista)} (${esc(i.cargo)}) · ${esc(i.correo)} · Sesión: ${esc(i.fechaEval)}</span></p>
+   <div style="overflow-x:auto"><table class="res"><tr><th>FESP</th><th>Brecha</th><th>Hallazgo</th><th>Puntaje</th><th>Grado</th><th>Periodo</th></tr>${rows}</table></div>`;
+}
+
+/* ---------- submit ---------- */
+function enviar(){
+  if(!$('conf').checked){toast('Confirme la validación de la información.');return}
+  const b=$('btnEnviar');b.disabled=true;b.innerHTML='<span class="spin"></span> Enviando…';
+  const data=payload();
+  const done=r=>{b.disabled=false;b.innerHTML='Enviar registro <span class="ar">➤</span>';
+    if(r&&r.ok){$('folio').textContent=r.folio;try{localStorage.removeItem(LS_KEY)}catch(e){}go(4);[...$('steps').children].forEach(s=>s.className='done')}
+    else toast('No se pudo registrar: '+((r&&r.msg)||'error desconocido'))};
+  if(IS_GAS){google.script.run.withSuccessHandler(done).withFailureHandler(e=>done({ok:false,msg:e.message})).guardarRegistro(data)}
+  else if(API_URL){
+    fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'guardar',data})})
+      .then(r=>r.json()).then(done).catch(()=>done({ok:false,msg:'Sin conexión con el servidor. Su captura sigue guardada en este equipo; intente de nuevo.'}));
+  }
+  else{setTimeout(()=>done({ok:true,folio:'DEMO-'+Date.now().toString().slice(-6)}),700)}
+}
+function nuevo(){try{localStorage.removeItem(LS_KEY)}catch(e){}location.reload()}
+
+/* ---------- draft ---------- */
+let tmr;
+function autosave(){clearTimeout(tmr);tmr=setTimeout(()=>{try{localStorage.setItem(LS_KEY,JSON.stringify(payload()));$('savedInfo').textContent='Borrador guardado en este equipo · '+new Date().toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit'})}catch(e){}},600)}
+function restore(){
+  let d;try{d=JSON.parse(localStorage.getItem(LS_KEY)||'null')}catch(e){}
+  if(!d)return;
+  const i=d.ident||{};
+  ['entidad','capturista','cargo','correo','telefono','fechaEval','participantes'].forEach(k=>{if(i[k])$(k).value=i[k]});
+  if(i.jurSel){$('jurisdiccion').value=i.jurSel;$('jurOtra').value=i.jurOtra||'';$('jurOtraBox').classList.toggle('hide',i.jurSel!=='__otra')}
+  (d.fesp||[]).forEach(f=>{
+    const cb=$('opt'+f.n).querySelector('input');cb.checked=true;$('opt'+f.n).classList.add('sel');
+    toggleFesp(f.n,true,{empty:true});
+    if(f.sinBrecha){setSinBrecha(f.n,f.obs);return}
+    (f.brechas||[]).forEach(b=>addBrecha(f.n,b));
+    if(!$('fb'+f.n).querySelector('.brecha'))addBrecha(f.n);
+  });
+  $('savedInfo').textContent='Se recuperó un borrador guardado en este equipo.';
+}
+function boot(){
+  const fc=window.FESP_CONFIG||{},imgLoc=fc.IMAGENES||{},hayLoc=Object.values(imgLoc).some(Boolean);
+  const fin=(cat,cfg)=>{CATALOGO=cat;CONFIG=cfg||{};if(hayLoc)CONFIG.imagenes=Object.assign({},CONFIG.imagenes||{},imgLoc);const c=$('cargando');if(c)c.remove();init();};
+  if(!API_URL){fin(CATALOGO_DEMO,CONFIG_DEMO);return}
+  $('cargando').innerHTML='<div class="spin2"></div><p>Cargando la información de la evaluación…</p>';
+  fetch(API_URL+'?action=config'+(hayLoc?'':'&img=1'))
+    .then(r=>r.json()).then(j=>{if(!j||!j.ok)throw new Error('respuesta');fin(j.catalogo,j.config)})
+    .catch(()=>{$('cargando').innerHTML='<p><b>No se pudo conectar con el servidor.</b><br>Verifique su conexión a internet e intente de nuevo.</p><button class="btn bp" type="button" onclick="boot()">Reintentar</button>'});
+}
+boot();
+</script>
+</body>
+</html>
