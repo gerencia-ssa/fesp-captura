@@ -116,6 +116,19 @@ footer{font-size:11.5px;color:var(--mu);padding:8px 16px 24px;max-width:920px;ma
  .secinfo{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
  .top{padding-top:8px}
 }
+/* ===== Captura en vivo ===== */
+.livepres{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:12px;color:var(--mu);margin-top:6px}
+.livepres .dot{width:8px;height:8px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 0 rgba(46,125,79,.5);animation:latido 2s infinite}
+.livepres .dot.off{background:#b9a99c;animation:none}
+@keyframes latido{0%{box-shadow:0 0 0 0 rgba(46,125,79,.45)}70%{box-shadow:0 0 0 7px rgba(46,125,79,0)}100%{box-shadow:0 0 0 0 rgba(46,125,79,0)}}
+.livepres .pc{background:#fff;border:1px solid var(--ln);border-radius:999px;padding:2px 9px;color:var(--tx);font-weight:600}
+.livepres .pc i{font-style:normal;font-weight:400;color:var(--mu)}
+.blk{font-size:11.5px;font-weight:700;border-radius:999px;padding:2px 9px;background:#fdecea;color:#9b2c2c}
+.brecha.locked{border-style:solid;border-color:#e9b7b7;background:#fffafa}
+.brecha.locked .bbody{opacity:.9}
+.brecha.locked .bbody input,.brecha.locked .bbody textarea{background:#f7f3f2;cursor:not-allowed}
+.brecha.mio{box-shadow:0 0 0 2px rgba(174,133,30,.35)}
+.secnav button.otro::after{content:"";position:absolute;top:-2px;right:-2px;width:10px;height:10px;border-radius:50%;background:#2b6cb0;border:2px solid #fff}
 /* ===== Dinámica de la interfaz ===== */
 /* ===== Plantilla institucional (igual que ÁGORA) ===== */
 .greca{height:34px;background:#701631 repeat-x left center;background-size:auto 100%}
@@ -226,6 +239,7 @@ section.anim.back{animation-name:entraIzq}
     <div class="steps" id="steps"><div data-s="1"><span class="ck">✓</span>1 · Datos</div><div data-s="2"><span class="ck">✓</span>2 · FESP y brechas</div><div data-s="3"><span class="ck">✓</span>3 · Revisión y envío</div></div>
     <div class="prog"><i id="progBar"></i></div>
     <div class="progtxt"><span id="progTxt">Avance de captura: 0%</span><span id="savedInfo"></span></div>
+    <div id="livePres" class="livepres hide"></div>
     <div id="secWrap" class="hide">
       <div class="secbar"><div class="secnav" id="secNav"></div></div>
       <div class="secinfo" id="secInfo"></div>
@@ -326,6 +340,136 @@ const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;',
 function toast(m){const t=$('toast');t.textContent=m;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),2600)}
 function grado(p){if(!p)return '';return p>=9?'Alta':p>=5?'Media':'Baja'}
 
+/* ---------- captura en vivo ---------- */
+const LIVE={on:false,jur:'',sid:'s'+Math.random().toString(36).slice(2,10),since:0,locks:{},pres:[],pend:{},saveT:null,pollT:null,applying:false,mine:new Set(),estado:''};
+function liveDisponible(){return CONFIG.live!==false&&(IS_GAS||!!API_URL)}
+function apiLiveCall(o){
+  if(IS_GAS) return new Promise((res,rej)=>google.script.run.withSuccessHandler(res).withFailureHandler(rej).apiLive(o));
+  return fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(o)}).then(r=>r.json());
+}
+function liveUser(){return $('capturista').value.trim()||'Sin nombre'}
+function liveKeyB(el){const fb=el.closest('[data-n]');return 'b:'+(fb?fb.dataset.n:'0')+':'+el.dataset.gid}
+function horaCorta(){return new Date().toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit',second:'2-digit'})}
+function liveSecLabel(){if(cur!==2)return ['','Datos','FESP','Revisión','Enviado'][cur]||'';if(sec===0)return 'Selección';const b=bloques()[sec-1];return b?'FESP '+b.dataset.n:''}
+function resetCaptura(){$('fespBlocks').innerHTML='';document.querySelectorAll('.fesp-opt').forEach(o=>{o.classList.remove('sel');o.querySelector('input').checked=false})}
+function asegurarFesp(n){if(!$('fb'+n)){const o=$('opt'+n);if(!o)return;o.querySelector('input').checked=true;o.classList.add('sel');toggleFesp(n,true,{empty:true})}}
+function quitarFesp(n){const b=$('fb'+n);if(b)b.remove();const o=$('opt'+n);if(o){o.classList.remove('sel');o.querySelector('input').checked=false}}
+function applyBrecha(el,d){el.querySelectorAll('input[type=checkbox],input[type=radio]').forEach(x=>x.checked=false);fillBrecha(el.id,d);if(d.hallOrig!==undefined)el.dataset.orig=d.hallOrig||'';calc(el.id)}
+function applyItems(items){
+  const curN=(cur===2&&sec>0&&bloques()[sec-1])?bloques()[sec-1].dataset.n:null;
+  LIVE.applying=true;
+  try{
+    items.filter(i=>i.key.indexOf('f:')===0).forEach(i=>{const n=+i.key.slice(2),d=i.data||{};
+      if(d.sel===false){quitarFesp(n);return}
+      asegurarFesp(n);const fb=$('fb'+n);if(!fb)return;const sb=fb.querySelector('.sb'),ob=fb.querySelector('.obs');
+      if(sb.checked!==!!d.sinBrecha){sb.checked=!!d.sinBrecha;toggleSinBrecha(n)}
+      if(document.activeElement!==ob)ob.value=d.obs||'';
+    });
+    items.filter(i=>i.key.indexOf('b:')===0).sort((a,b)=>((a.data||{}).orden||0)-((b.data||{}).orden||0)).forEach(i=>{
+      const p=i.key.split(':'),n=+p[1],gid=p[2],d=i.data||{};let el=document.querySelector(`.brecha[data-gid="${gid}"]`);
+      if(d.deleted){if(el){el.remove();if($('fb'+n)){renumber(n);calcFesp(n)}}return}
+      if(!el){asegurarFesp(n);if($('fb'+n))addBrecha(n,d,gid);return}
+      if(LIVE.mine.has(i.key)||el.contains(document.activeElement))return;
+      applyBrecha(el,d);
+    });
+  }finally{LIVE.applying=false}
+  if(cur===2){const bl=bloques();if(curN){const i=bl.findIndex(b=>b.dataset.n===curN);sec=i>=0?i+1:Math.min(sec,bl.length)}
+    bl.forEach((b,k)=>b.classList.toggle('hide',k+1!==sec));$('selCard').classList.toggle('hide',sec!==0)}
+  estadosBrecha();renderNav();progreso();autosave();
+}
+function liveQueue(key,fn){if(!LIVE.on||LIVE.applying)return;LIVE.pend[key]=fn;clearTimeout(LIVE.saveT);LIVE.saveT=setTimeout(liveFlush,1200);liveEstado('Guardando…')}
+function liveQueueB(el){liveQueue(liveKeyB(el),()=>readBrecha(el))}
+function liveQueueF(n){liveQueue('f:'+n,()=>{const fb=$('fb'+n);return fb?{sel:true,sinBrecha:fb.querySelector('.sb').checked,obs:fb.querySelector('.obs').value.trim()}:{sel:false}})}
+function liveQueueAll(){bloques().forEach(b=>{liveQueueF(+b.dataset.n);b.querySelectorAll('.brecha').forEach(liveQueueB)})}
+function liveItemsPendientes(){const ks=Object.keys(LIVE.pend);const it=ks.map(k=>({key:k,data:LIVE.pend[k](),lock:LIVE.mine.has(k)}));LIVE.pend={};return it}
+async function liveFlush(){
+  if(!LIVE.on)return;const items=liveItemsPendientes();if(!items.length)return;
+  try{const r=await apiLiveCall({action:'liveSave',jur:LIVE.jur,sid:LIVE.sid,user:liveUser(),items});
+    if(!r||!r.ok)throw new Error('x');
+    (r.rechazados||[]).forEach(x=>toast(`${x.holder} está editando ese hallazgo; su cambio no se guardó.`));
+    liveEstado('Guardado en vivo · '+horaCorta());
+  }catch(e){items.forEach(it=>{if(!LIVE.pend[it.key])LIVE.pend[it.key]=()=>it.data});liveEstado('Sin conexión · reintentando');clearTimeout(LIVE.saveT);LIVE.saveT=setTimeout(liveFlush,5000)}
+}
+async function liveStart(){
+  const jur=payload().ident.jurisdiccion;if(!jur)return;
+  if(LIVE.jur&&LIVE.jur!==jur)resetCaptura();
+  LIVE.jur=jur;LIVE.on=true;LIVE.since=0;liveEstado('Conectando…');
+  let r=null;try{r=await apiLiveCall({action:'live',jur,sid:LIVE.sid,user:liveUser(),sec:'Selección',since:0})}catch(e){}
+  const bn=$('precargaBanner');
+  if(!r||!r.ok){LIVE.on=false;aplicarPrecarga();showSec(bloques().length?1:0);$('livePres').classList.add('hide');toast('Sin conexión en vivo: la captura se guarda solo en este equipo.');return}
+  LIVE.since=r.now-3000;
+  if((r.items||[]).length){
+    resetCaptura();applyItems(r.items);
+    bn.innerHTML=`<b>Captura en vivo · ${esc(jur)}.</b><br>Se cargó lo que el equipo ya integró (${document.querySelectorAll('.brecha').length} hallazgos). Los cambios de las demás personas aparecen solos; un hallazgo que otra persona está editando se muestra bloqueado.`;
+    bn.classList.remove('hide');
+  }else{
+    if(!bloques().length)aplicarPrecarga();
+    if(!bn.classList.contains('hide'))bn.innerHTML+='<br><b>Captura en vivo activada:</b> su equipo puede trabajar al mismo tiempo; cada hallazgo se bloquea mientras alguien lo edita.';
+    liveQueueAll();liveFlush();
+  }
+  liveHandle(r);showSec(bloques().length?1:0);livePollLoop();
+}
+function livePollLoop(){clearTimeout(LIVE.pollT);LIVE.pollT=setTimeout(livePoll,document.hidden?20000:5000)}
+async function livePoll(){
+  if(!LIVE.on)return;
+  try{const r=await apiLiveCall({action:'live',jur:LIVE.jur,sid:LIVE.sid,user:liveUser(),sec:liveSecLabel(),since:LIVE.since,hold:[...LIVE.mine]});
+    if(r&&r.ok){LIVE.since=r.now-3000;const its=(r.items||[]).filter(i=>i.sid!==LIVE.sid);if(its.length)applyItems(its);liveHandle(r);
+      if(!Object.keys(LIVE.pend).length&&!/Guardando|reintentando/.test(LIVE.estado))liveEstado('Sincronizado · '+horaCorta())}
+  }catch(e){liveEstado('Sin conexión · reintentando')}
+  livePollLoop();
+}
+function liveHandle(r){
+  LIVE.locks=r.locks||{};LIVE.pres=r.pres||[];
+  [...LIVE.mine].forEach(k=>{const l=LIVE.locks[k];if(l&&l.sid!==LIVE.sid)LIVE.mine.delete(k)});
+  liveApplyLocks();livePresRender();renderNav();
+}
+function liveApplyLocks(){
+  document.querySelectorAll('.brecha').forEach(el=>{const k=liveKeyB(el),l=LIVE.locks[k],otro=!!(l&&l.sid!==LIVE.sid);
+    el.classList.toggle('locked',otro);el.classList.toggle('mio',LIVE.mine.has(k));
+    const b=el.querySelector('.blk');b.classList.toggle('hide',!otro);if(otro)b.textContent='🔒 '+l.name+' está editando';
+    el.querySelectorAll('.bbody input,.bbody textarea,.bbody select,.bbody button,.bh .bl').forEach(x=>x.disabled=otro);
+    if(otro&&el.contains(document.activeElement))document.activeElement.blur();});
+}
+function liveEstado(t){LIVE.estado=t;livePresRender()}
+function livePresRender(){
+  const box=$('livePres');if(!LIVE.on){box.classList.add('hide');return}
+  const otros=LIVE.pres.filter(p=>p.sid!==LIVE.sid);
+  const off=/Sin conexión/.test(LIVE.estado);
+  box.innerHTML=`<span class="dot${off?' off':''}"></span><b>En vivo</b> · ${esc(LIVE.estado)}`+
+    (otros.length?` · ${otros.length} más en línea: `+otros.map(p=>`<span class="pc">${esc(p.name)} <i>${esc(p.sec||'')}</i></span>`).join(' '):' · solo usted en este momento');
+  box.classList.remove('hide');
+}
+async function liveOnFocus(e){
+  if(!LIVE.on||!e.target||!e.target.closest)return;const el=e.target.closest('.brecha');if(!el||!e.target.closest('.bbody'))return;
+  const k=liveKeyB(el);if(LIVE.mine.has(k))return;
+  const l=LIVE.locks[k];if(l&&l.sid!==LIVE.sid){if(e.target.blur)e.target.blur();toast(`${l.name} está editando este hallazgo. Podrá editarlo cuando termine.`);return}
+  LIVE.mine.add(k);liveApplyLocks();
+  try{const r=await apiLiveCall({action:'lock',jur:LIVE.jur,sid:LIVE.sid,user:liveUser(),key:k,on:true});
+    if(r&&r.locks)LIVE.locks=r.locks;
+    if(!r||!r.ok){LIVE.mine.delete(k);if(r&&r.holder)toast(`${r.holder} está editando este hallazgo.`)}
+    liveApplyLocks();
+  }catch(_){}
+}
+function liveOnEdit(e){
+  if(!LIVE.on||LIVE.applying||!e.target||!e.target.closest)return;const t=e.target;
+  const el=t.closest('.brecha');
+  if(el){if(!t.closest('.bbody'))return;if(el.classList.contains('locked'))return;if(!LIVE.mine.has(liveKeyB(el)))liveOnFocus({target:t});liveQueueB(el);return}
+  const fb=t.closest('#fespBlocks > .card');if(fb&&(t.classList.contains('sb')||t.classList.contains('obs')))liveQueueF(+fb.dataset.n);
+}
+function liveReleaseClosed(){
+  if(!LIVE.on)return;
+  [...LIVE.mine].forEach(k=>{const gid=k.split(':')[2],el=document.querySelector(`.brecha[data-gid="${gid}"]`);
+    const visible=el&&cur===2&&el.classList.contains('open')&&!el.closest('.card').classList.contains('hide');
+    if(!visible){LIVE.mine.delete(k);if(LIVE.pend[k])liveFlush();apiLiveCall({action:'lock',jur:LIVE.jur,sid:LIVE.sid,key:k,on:false}).catch(()=>{})}});
+  liveApplyLocks();
+}
+function liveSalir(){
+  if(!LIVE.on||!API_URL||!navigator.sendBeacon)return;
+  const items=liveItemsPendientes();
+  if(items.length)navigator.sendBeacon(API_URL,JSON.stringify({action:'liveSave',jur:LIVE.jur,sid:LIVE.sid,user:liveUser(),items}));
+  navigator.sendBeacon(API_URL,JSON.stringify({action:'release',jur:LIVE.jur,sid:LIVE.sid}));
+}
+
 /* ---------- init ---------- */
 function init(){
   if(!IS_GAS && !API_URL) $('demoBar').classList.remove('hide');
@@ -350,6 +494,10 @@ function init(){
   $('fespList').innerHTML=html;
   document.addEventListener('input',autosave);
   document.addEventListener('change',autosave);
+  document.addEventListener('input',liveOnEdit);document.addEventListener('change',liveOnEdit);
+  document.addEventListener('focusin',liveOnFocus);
+  window.addEventListener('pagehide',liveSalir);
+  document.addEventListener('visibilitychange',()=>{if(LIVE.on&&!document.hidden){clearTimeout(LIVE.pollT);livePoll()}});
   restore();
   paintSteps(1);progreso();
 }
@@ -401,6 +549,7 @@ function toggleFesp(n,on,opt){
     if(confirmLoss(id)) $(id).remove(); else {$('opt'+n).querySelector('input').checked=true;$('opt'+n).classList.add('sel')}
   }
   if($('secWrap')){if(cur===2&&sec===0)bloques().forEach(b=>b.classList.add('hide'));renderNav()}
+  if(!LIVE.applying) liveQueueF(n);
   autosave();
 }
 /* ---------- secciones ---------- */
@@ -423,6 +572,8 @@ function renderNav(){
   $('secNav').innerHTML=`<button type="button" data-i="0" title="Selección de FESP">☰</button>`+
     bl.map((b,i)=>`<button type="button" data-i="${i+1}" class="${estadoFesp(b)}" title="FESP ${b.dataset.n}">${b.dataset.n}</button>`).join('');
   [...$('secNav').children].forEach(x=>x.classList.toggle('on',+x.dataset.i===sec));
+  if(LIVE.on) bl.forEach((b,i)=>{const otros=LIVE.pres.filter(p=>p.sid!==LIVE.sid&&p.sec==='FESP '+b.dataset.n);const bt=$('secNav').children[i+1];
+    if(otros.length){bt.classList.add('otro');bt.title='FESP '+b.dataset.n+' · en esta sección: '+otros.map(p=>p.name).join(', ')}});
   const on=$('secNav').querySelector('.on');if(on&&on.scrollIntoView)on.scrollIntoView({block:'nearest',inline:'center'});
 }
 function showSec(i,atras){
@@ -438,7 +589,7 @@ function showSec(i,atras){
   } else $('secInfo').textContent='Selección de las FESP a registrar';
   $('secPrev').innerHTML=sec===0?'<span class="ar al">←</span> Regresar':'<span class="ar al">←</span> Anterior';
   $('secNext').innerHTML=sec>=bl.length?'Revisar <span class="ar">→</span>':(sec===0?'Comenzar captura':'Siguiente FESP')+' <span class="ar">→</span>';
-  renderNav();estadosBrecha();window.scrollTo({top:0,behavior:'smooth'});
+  renderNav();estadosBrecha();liveReleaseClosed();window.scrollTo({top:0,behavior:'smooth'});
 }
 function secMove(d){
   const bl=bloques();
@@ -452,6 +603,7 @@ function toggleAcc(e,u){
   const el=$(u),abrir=!el.classList.contains('open');
   el.parentElement.querySelectorAll('.brecha.open').forEach(x=>x.classList.remove('open'));
   if(abrir){el.classList.add('open');setTimeout(()=>el.scrollIntoView({behavior:'smooth',block:'start'}),60)}
+  liveReleaseClosed();
 }
 function sigHallazgo(u){
   const el=$(u),s=brechaOk(el);
@@ -460,7 +612,7 @@ function sigHallazgo(u){
   const nx=el.nextElementSibling;
   if(nx){nx.classList.add('open');setTimeout(()=>nx.scrollIntoView({behavior:'smooth',block:'start'}),60)}
   else{toast('Último hallazgo de esta FESP. Continúe con la siguiente sección.');$('secNext').focus()}
-  estadosBrecha();renderNav();
+  estadosBrecha();renderNav();liveReleaseClosed();
 }
 function estadosBrecha(){
   document.querySelectorAll('.brecha').forEach(el=>{
@@ -473,21 +625,24 @@ function toggleSinBrecha(n){
   const fb=$('fb'+n),on=fb.querySelector('.sb').checked;
   fb.querySelector('.sbBox').classList.toggle('hide',!on);
   fb.querySelector('.bwrap').classList.toggle('hide',on);
-  if(!on&&!fb.querySelector('.brecha'))addBrecha(n);
+  if(!on&&!fb.querySelector('.brecha')&&!LIVE.applying)addBrecha(n);
 }
 function setSinBrecha(n,obs){const fb=$('fb'+n);fb.querySelector('.sb').checked=true;fb.querySelector('.obs').value=obs||'';toggleSinBrecha(n)}
 function confirmLoss(id){
   const has=[...$(id).querySelectorAll('textarea')].some(t=>t.value.trim());
   return !has || window.confirm('Se eliminará la información capturada en esta FESP. ¿Desea continuar?');
 }
-function addBrecha(n,data){
+function nuevoGid(n){return 'n'+n+'-'+Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
+function addBrecha(n,data,gid){
   const f=CATALOGO.find(x=>x.n===n);
   const box=$('fb'+n).querySelector('.brechas');
   const u='b'+(++seq);
   const el=document.createElement('div');el.className='brecha';el.id=u;
   if(data&&data.hallOrig) el.dataset.orig=data.hallOrig;
+  el.dataset.gid=gid||(data&&data.gid)||nuevoGid(n);
+  el.dataset.orden=(data&&data.orden)||Date.now();
   el.innerHTML=`
-   <div class="bh" onclick="toggleAcc(event,'${u}')"><span class="bhl"><span class="chev">▶</span><b class="bt"></b>${data&&data.hallOrig?'<span class="badge">Precargado</span>':''}<span class="bst">Pendiente</span><span class="bprev"></span></span><button type="button" class="btn bl" onclick="delBrecha('${u}')">Eliminar</button></div>
+   <div class="bh" onclick="toggleAcc(event,'${u}')"><span class="bhl"><span class="chev">▶</span><b class="bt"></b>${data&&data.hallOrig?'<span class="badge">Precargado</span>':''}<span class="bst">Pendiente</span><span class="blk hide"></span><span class="bprev"></span></span><button type="button" class="btn bl" onclick="delBrecha('${u}')">Eliminar</button></div>
    <div class="bbody">
    <div data-f="comp"><label class="f">Componente(s) de la FESP relacionados <span class="req">*</span></label>
      <div class="chips">${f.comp.map(c=>`<label class="chip"><input type="checkbox" name="${u}_comp" value="${esc(c)}">${esc(c)}</label>`).join('')}</div>
@@ -537,12 +692,16 @@ function addBrecha(n,data){
   if(!data) el.classList.add('open');
   if(data) fillBrecha(u,data);
   renumber(n);calc(u);progreso();
+  if(!data&&!LIVE.applying) liveQueueB(el);
+  if(LIVE.on) liveApplyLocks();
   return u;
 }
 function delBrecha(u){
   const el=$(u),fb=el.closest('[data-n]'),n=+fb.dataset.n;
   if(fb.querySelectorAll('.brecha').length===1){toast('Cada FESP seleccionada requiere al menos una brecha.');return}
+  if(el.classList.contains('locked')){toast('Otra persona está editando este hallazgo.');return}
   if([...el.querySelectorAll('textarea')].some(t=>t.value.trim()) && !window.confirm('¿Eliminar esta brecha?'))return;
+  if(LIVE.on){const k=liveKeyB(el);liveQueue(k,()=>({deleted:true}));LIVE.mine.delete(k)}
   el.remove();renumber(n);calcFesp(n);progreso();autosave();
 }
 function renumber(n){$('fb'+n).querySelectorAll('.brecha').forEach((b,i)=>b.querySelector('.bt').textContent='Brecha '+(i+1))}
@@ -577,7 +736,7 @@ function readBrecha(el){
   CRITERIOS.forEach(c=>{const r=el.querySelector(`input[name="${u}_${c.k}_nivel"]:checked`);crit[c.k]={nivel:r?r.value:'',desc:v(c.k+'_desc')}});
   const orig=el.dataset.orig||'';
   const origen=!orig?'Capturado por la Jurisdicción':(v('hallazgo')===orig?'Precargado de la evaluación':'Precargado y modificado');
-  return {hallOrig:orig,origen,componentes:checks('comp'),hallazgo:v('hallazgo'),crit,justificacion:v('justificacion'),objetivo:v('objetivo'),estrategias:v('estrategias'),responsables:v('responsables'),alianzas:v('alianzas'),inicio:v('inicio'),fin:v('fin'),recTipos:checks('recTipos'),recDisponibles:v('recDisp'),recGestionar:v('recGest')};
+  return {gid:el.dataset.gid,orden:+el.dataset.orden||0,hallOrig:orig,origen,componentes:checks('comp'),hallazgo:v('hallazgo'),crit,justificacion:v('justificacion'),objetivo:v('objetivo'),estrategias:v('estrategias'),responsables:v('responsables'),alianzas:v('alianzas'),inicio:v('inicio'),fin:v('fin'),recTipos:checks('recTipos'),recDisponibles:v('recDisp'),recGestionar:v('recGest')};
 }
 function fillBrecha(u,d){
   const el=$(u),set=(nm,val)=>{const x=el.querySelector(`[name="${u}_${nm}"]`);if(x)x.value=val||''};
@@ -639,12 +798,16 @@ function go(n){
       else toast('Seleccione al menos una FESP.');
       return}
   }
-  if(n===2&&cur===1) aplicarPrecarga();
+  if(n===2&&cur===1){
+    if(liveDisponible()){const j=payload().ident.jurisdiccion;if(!LIVE.on||LIVE.jur!==j) setTimeout(liveStart,0)}
+    else aplicarPrecarga();
+  }
   $('secWrap').classList.toggle('hide',n!==2);
   if(n===3) buildResumen();
   ['p1','p2','p3','p4'].forEach((p,i)=>$(p).classList.toggle('hide',i+1!==n));
   animar('p'+n,n<cur);
   const prev=cur;cur=n;paintSteps(n);progreso();window.scrollTo({top:0,behavior:'smooth'});
+  liveReleaseClosed();
   if(n===2) showSec(prev===1?(bloques().length&&$('precargaBanner').textContent&&!$('precargaBanner').classList.contains('hide')?1:sec):sec,prev>2);
 }
 function aplicarPrecarga(){
@@ -657,7 +820,7 @@ function aplicarPrecarga(){
     o.querySelector('input').checked=true;o.classList.add('sel');
     toggleFesp(n,true,{empty:true});
     if(f.sinBrecha){setSinBrecha(n,f.obs)}
-    else f.brechas.forEach(b=>{addBrecha(n,{hallazgo:b.hallazgo,hallOrig:b.hallazgo,componentes:b.componentes});nb++});
+    else f.brechas.forEach((b,i)=>{addBrecha(n,{hallazgo:b.hallazgo,hallOrig:b.hallazgo,componentes:b.componentes,orden:i+1},`p${n}-${i+1}`);nb++});
   });
   bn.innerHTML=`<b>Se precargaron ${nb} hallazgos de la evaluación FESP de ${esc(jur)}.</b><br>Revise cada hallazgo, confirme los componentes relacionados y complete la priorización y el plan de acción. Puede editar, eliminar o agregar brechas.`;
   bn.classList.remove('hide');autosave();
