@@ -87,6 +87,46 @@ footer{background:#fff;border-top:3px solid var(--o);margin-top:20px}
 footer .wrapx{font-size:12.5px;color:#4A3B3F}
 footer img{height:70px;width:auto}
 .hide{display:none!important}
+.fc.rv-validada{outline:2.5px solid var(--ok);outline-offset:2px}
+.fc.rv-ajustes{outline:2.5px solid var(--lo);outline-offset:2px}
+.fc.rv-corregida{outline:2.5px dashed var(--md);outline-offset:2px}
+.rvc{font-size:11.5px;font-weight:700;border-radius:999px;padding:2px 10px}
+.rvc.validada{background:#dff0e5;color:var(--ok)}.rvc.ajustes{background:#fdecea;color:var(--lo)}.rvc.corregida{background:#fbecc9;color:#7a4e0b}.rvc.pend{background:#f4f1ee;color:#a99f96}
+.revobs{padding:0 14px 10px;font-size:12.5px;color:var(--mu)}
+.dethead{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:6px 0 10px}
+.dethead h3{margin:0}
+.btn.sec{background:#fff;color:var(--g);border:1.5px solid var(--g)}
+#informe{position:fixed;inset:0;z-index:60;background:#ece7e1;overflow:auto}
+#informe .bar2{position:sticky;top:0;z-index:2;background:var(--g);color:#fff;display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 16px}
+#informe .bar2 b{flex:1;min-width:180px}
+#informe .bar2 .btn{background:#fff;color:var(--g)}
+#informe .bar2 .btn.cl{background:transparent;color:#fff;border:1.5px solid #fff}
+.hoja{max-width:860px;margin:18px auto 40px;background:#fff;box-shadow:0 4px 24px rgba(0,0,0,.12);padding:34px 40px;font-size:13px;line-height:1.45}
+.hoja .encab{display:flex;align-items:center;justify-content:space-between;gap:12px;border-bottom:3px solid var(--o);padding-bottom:10px;margin-bottom:14px}
+.hoja .encab img{height:44px}
+.hoja h1{font-size:22px;margin:0 0 2px}
+.hoja h2{font-family:"Noto Serif",Georgia,serif;color:var(--g);font-size:17px;margin:22px 0 8px;border-bottom:1px solid var(--ln);padding-bottom:4px}
+.hoja h3{font-size:14px;margin:14px 0 6px;color:var(--tx)}
+.hoja table{width:100%;border-collapse:collapse;margin:6px 0 10px;font-size:12.5px}
+.hoja th,.hoja td{border:1px solid #d9cfc9;padding:5px 7px;vertical-align:top;text-align:left}
+.hoja th{background:#f3eee6;color:#4A3B3F;font-weight:600}
+.hoja .k{width:26%;background:#faf7f3;font-weight:600;color:#4A3B3F}
+.hoja .pend{color:var(--lo);font-weight:700}
+.hoja .val{border:1.5px dashed #b9a99c;border-radius:6px;padding:8px 10px;margin:6px 0 14px}
+.hoja .lin{border-bottom:1px solid #b9a99c;height:20px}
+.hoja .meta{color:var(--mu);font-size:12px}
+.hoja .firmas{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:40px;text-align:center;font-size:12px}
+.hoja .firmas div{border-top:1px solid #4A3B3F;padding-top:6px}
+@media print{
+ body>*:not(#informe){display:none!important}
+ #informe{position:static;background:#fff;overflow:visible}
+ #informe .bar2{display:none}
+ .hoja{box-shadow:none;margin:0;max-width:none;padding:0}
+ .hoja .fesp{break-before:page}
+ .hoja .val,.hoja table{break-inside:avoid}
+ .hoja h3{break-after:avoid}
+ @page{size:letter;margin:16mm 14mm}
+}
 @media(max-width:700px){.kpis{grid-template-columns:1fr 1fr}.kpis .kpi:last-child{grid-column:span 2}.unit{display:none}
  .stack thead{display:none}.stack tr{display:grid;padding:8px 0;border-top:1px solid var(--ln)}.stack td{border:0;padding:3px 12px;display:flow-root}
  .stack td::before{content:attr(data-l);float:left;width:7.5em;color:var(--mu);font-size:12px}.stack td.n{text-align:left}}
@@ -121,10 +161,18 @@ footer img{height:70px;width:auto}
       <span><i style="background:var(--ok)"></i>Completa</span><span><i style="background:#dbe8f6;border:1px solid #a9c6e8"></i>Sin brecha</span>
       <span><i style="background:#fff;border:1px dashed #ddd2c7"></i>No seleccionada</span>
       <span><i style="background:var(--sin);border-radius:50%"></i>Alguien editando</span><span>✓ Enviada a la matriz</span>
+      <span><i style="background:#fff;outline:2.5px solid var(--ok)"></i>Validada por el líder</span><span><i style="background:#fff;outline:2.5px solid var(--lo)"></i>Requiere ajustes</span><span><i style="background:#fff;outline:2.5px dashed var(--md)"></i>Corregida, por revisar</span>
     </div>
     <section class="det hide" id="det"></section>
   </div>
 </main>
+<div id="informe" class="hide" role="dialog" aria-label="Informe para validación">
+  <div class="bar2"><b id="infTit">Informe para validación</b>
+    <button class="btn" type="button" id="infPrint">Imprimir / Guardar PDF</button>
+    <button class="btn" type="button" id="infWord">Descargar Word</button>
+    <button class="btn cl" type="button" id="infClose">Cerrar</button></div>
+  <div class="hoja" id="infHoja"></div>
+</div>
 <footer><div class="wrapx"><div><b style="color:var(--g)">SNSP · Coordinación Estatal Morelos.</b> Tablero de solo lectura; se actualiza cada 10 segundos.</div><img id="emblema" class="hide" alt="Emblema institucional 2026"></div></footer>
 <script>
 {
@@ -136,6 +184,8 @@ const IMG = Object.assign({}, CONFIG.imagenes || {}, FC.IMAGENES || {});
 const $ = id => document.getElementById(id);
 const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const EST = {pend:'Pendiente', mid:'En proceso', ok:'Completa', sin:'Sin brecha', no:'No seleccionada'};
+const REVT = {'':'Pendiente de revisión', validada:'Validada', ajustes:'Requiere ajustes', corregida:'Corregida · por revisar'};
+const revChip = r => { const e = (r && r.estado) || ''; return `<span class="rvc ${e || 'pend'}">${REVT[e]}${r && r.por && e ? ' · ' + esc(r.por) : ''}</span>`; };
 let PIN = '', selJur = '', tmr = null, abiertos = new Set();
 try { PIN = sessionStorage.getItem('fesp_tablero_pin') || ''; } catch (e) {}
 
@@ -180,7 +230,8 @@ function render(r) {
       <div class="meta">${j.enLinea.length ? `<b style="color:var(--ok)">● ${j.enLinea.length} en línea</b>` : 'Nadie capturando ahora'} · Última actividad ${hace(j.ultimo)}${j.ultimoPor ? ' por ' + esc(j.ultimoPor) : ''}</div>
       ${j.enLinea.length ? `<div class="chips">${j.enLinea.map(p => `<span class="pc">${esc(p.name)} <i>${esc(p.sec || '')}</i></span>`).join('')}</div>` : ''}
       <div class="meta">Enviadas a la matriz: <b>${j.enviadas} de 11</b>${j.ultimoEnvio ? ' · último envío ' + hace(j.ultimoEnvio) : ''}</div>
-      <div class="fg">${j.fesp.map(f => `<div class="fc ${f.estado}" title="FESP ${f.n} · ${esc(f.corto)} · ${EST[f.estado]}${f.brechas ? ' · ' + f.brechas + ' hallazgos' : ''}${f.editando.length ? ' · editando: ' + esc(f.editando.join(', ')) : ''}${f.enviada ? ' · enviada' : ''}">${f.n}${f.editando.length ? '<span class="ed"></span>' : ''}${f.enviada ? '<span class="env">✓</span>' : ''}</div>`).join('')}</div>
+      <div class="meta">Revisión del líder: <b>${j.fesp.filter(f => f.revision && f.revision.estado === 'validada').length} de 11 validadas</b>${j.fesp.some(f => f.revision && f.revision.estado === 'ajustes') ? ` · <span style="color:var(--lo);font-weight:700">${j.fesp.filter(f => f.revision && f.revision.estado === 'ajustes').length} con ajustes</span>` : ''}</div>
+      <div class="fg">${j.fesp.map(f => `<div class="fc ${f.estado}${f.revision && f.revision.estado ? ' rv-' + f.revision.estado : ''}" title="FESP ${f.n} · ${esc(f.corto)} · ${EST[f.estado]}${f.revision && f.revision.estado ? ' · revisión: ' + REVT[f.revision.estado] : ''}${f.brechas ? ' · ' + f.brechas + ' hallazgos' : ''}${f.editando.length ? ' · editando: ' + esc(f.editando.join(', ')) : ''}${f.enviada ? ' · enviada' : ''}">${f.n}${f.editando.length ? '<span class="ed"></span>' : ''}${f.enviada ? '<span class="env">✓</span>' : ''}</div>`).join('')}</div>
     </article>`).join('');
   $('grid').querySelectorAll('.jc').forEach(c => {
     const ir = () => { selJur = c.dataset.jur; abiertos = new Set(); render(r); detalle(true); };
@@ -203,14 +254,106 @@ function renderDetalle(d) {
       <td data-l="Estado">${b.editando ? `<span class="ed2">✎ ${esc(b.editando)}</span>` : (b.ultimoPor ? `<span style="font-size:12px;color:var(--mu)">${esc(b.ultimoPor)} · ${hace(b.ultimo)}</span>` : '')}</td>
     </tr>`).join('')}</tbody></table>` : '<div class="vacio">Aún no hay hallazgos registrados.</div>';
   const estado = f => !f.sel ? 'no' : f.sinBrecha ? (f.obs ? 'sin' : 'mid') : !f.brechas.length ? 'pend' : f.brechas.every(b => b.campos === b.total) ? 'ok' : f.brechas.some(b => b.campos > 2) ? 'mid' : 'pend';
-  box.innerHTML = `<h3>Detalle · ${esc(d.jur)}</h3>` + d.fesp.map(f => {
+  box.innerHTML = `<div class="dethead"><h3>Detalle · ${esc(d.jur)}</h3><button class="btn" type="button" id="btnInf">📄 Informe para validación</button></div>` + d.fesp.map(f => {
     const st = estado(f), ed = f.brechas.filter(b => b.editando).map(b => b.editando);
     return `<details class="fx" data-n="${f.n}"${abiertos.has(f.n) ? ' open' : ''}><summary><span class="num">${f.n}</span><b>${esc(f.corto)}</b>
-      <span class="st ${st}">${EST[st]}</span>${f.brechas.length ? `<span class="st pend">${f.brechas.length} hallazgos</span>` : ''}${ed.length ? `<span class="ed2">✎ ${esc([...new Set(ed)].join(', '))}</span>` : ''}</summary>
+      <span class="st ${st}">${EST[st]}</span>${revChip(f.revision)}${f.brechas.length ? `<span class="st pend">${f.brechas.length} hallazgos</span>` : ''}${ed.length ? `<span class="ed2">✎ ${esc([...new Set(ed)].join(', '))}</span>` : ''}</summary>
+      ${f.revision && f.revision.obs ? `<div class="revobs"><b>Observaciones del líder:</b> ${esc(f.revision.obs)}</div>` : ''}
       ${f.sinBrecha ? `<div class="obs"><b>Sin brecha identificada.</b> ${esc(f.obs)}</div>` : filas(f)}</details>`;
   }).join('');
   box.querySelectorAll('details.fx').forEach(x => x.addEventListener('toggle', () => { const n = +x.dataset.n; x.open ? abiertos.add(n) : abiertos.delete(n); }));
+  $('btnInf').addEventListener('click', generarInforme);
 }
+
+/* ---------- informe para validación ---------- */
+let INF = null;
+const fFecha = s => { if (!s) return ''; const p = String(s).split('-'); return p.length === 3 ? `${p[2]}/${p[1]}/${p[0]}` : s; };
+const fHora = ms => new Date(ms).toLocaleString('es-MX', {day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit'});
+const abs = src => { try { return src && !/^data:/.test(src) ? new URL(src, location.href).href : src; } catch (e) { return src; } };
+const val = (x, pendiente) => x && String(x).trim() ? esc(x).replace(/\n/g, '<br>') : (pendiente ? '<span class="pend">Pendiente</span>' : '—');
+const CRN = ['Magnitud', 'Relevancia', 'Factibilidad', 'Viabilidad'];
+function estadoF(f) { return !f.sel ? 'no' : f.sinBrecha ? (f.obs ? 'sin' : 'mid') : !f.brechas.length ? 'pend' : f.brechas.every(b => b.campos === b.total) ? 'ok' : f.brechas.some(b => b.campos > 2) ? 'mid' : 'pend'; }
+function cajaValidacion(n) {
+  return `<div class="val"><b>Validación estatal${n ? ' · ' + n : ''}:</b> &nbsp; ☐ Validado &nbsp;&nbsp; ☐ Requiere ajustes<br>Observaciones:<div class="lin"></div><div class="lin"></div></div>`;
+}
+function informeHTML(d) {
+  const sel = d.fesp.filter(f => f.sel);
+  const nH = sel.reduce((a, f) => a + f.brechas.length, 0), nOk = sel.reduce((a, f) => a + f.brechas.filter(b => b.campos === b.total).length, 0);
+  let h = `<div class="encab">${IMG.logo ? `<img src="${abs(IMG.logo)}" alt="Salud · SNSP">` : '<b style="color:#701631">Salud · SNSP</b>'}<div style="text-align:right;font-size:12px;color:#4A3B3F"><b style="color:#701631">Coordinación Estatal ${esc(d.entidad || 'Morelos')}</b><br>Servicio Nacional de Salud Pública</div></div>
+  <div class="meta" style="text-transform:uppercase;letter-spacing:.6px;color:#AE851E;font-weight:700">Informe de captura para validación</div>
+  <h1 style="font-family:'Noto Serif',Georgia,serif;color:#701631">Plan de Acción para el Fortalecimiento de las FESP</h1>
+  <div style="font-size:15px;font-weight:600">${esc(d.jur)}</div>
+  <div class="meta">Generado el ${fHora(d.generado)} con la captura en curso registrada en el servidor. ${nH} hallazgos en ${sel.length} FESP; ${nOk} completos.</div>
+  <h2>Resumen por FESP</h2>
+  <table><tr><th>FESP</th><th>Estado de captura</th><th>Hallazgos (completos)</th><th>Priorización consolidada</th><th>Revisión del líder</th><th>Enviada a la matriz</th></tr>
+  ${d.fesp.map(f => `<tr><td>${f.n}. ${esc(f.corto)}</td><td>${EST[estadoF(f)]}</td><td>${f.sinBrecha ? 'Sin brecha' : `${f.brechas.length} (${f.brechas.filter(b => b.campos === b.total).length})`}</td>
+    <td>${f.consolidado ? `${f.consolidado.grado} · ${f.consolidado.puntaje}/12` : (f.sinBrecha ? 'No aplica' : '<span class="pend">Incompleta</span>')}</td>
+    <td>${REVT[(f.revision && f.revision.estado) || '']}${f.revision && f.revision.por && f.revision.estado ? `<br><span class="meta">${esc(f.revision.por)} · ${fHora(f.revision.ts)}</span>` : ''}</td>
+    <td>${f.envio ? `Sí · ${esc(f.envio.folio)}<br><span class="meta">${fHora(f.envio.t)}</span>` : 'No'}</td></tr>`).join('')}</table>
+  <p class="meta">Escala de priorización: Alta 3, Media 2, Baja 1 por criterio; puntaje total Baja 1–4, Media 5–8, Alta 9–12. La priorización consolidada es el promedio redondeado de los hallazgos por criterio, igual que en la matriz oficial.</p>`;
+  sel.forEach(f => {
+    h += `<section class="fesp"><h2>FESP ${f.n}. ${esc(f.corto)}</h2><p class="meta">${esc(f.nombre)} · ${esc(f.area)}</p>`;
+    if (f.revision && f.revision.estado) h += `<table><tr><td class="k">Revisión del líder distrital</td><td><b>${REVT[f.revision.estado]}</b> · ${esc(f.revision.por || '')} · ${fHora(f.revision.ts)}${f.revision.obs ? '<br>Observaciones: ' + esc(f.revision.obs) : ''}${f.revision.estado === 'corregida' ? '<br>Corregida por ' + esc(f.revision.corregidaPor || '') + ' · ' + fHora(f.revision.tsCorr) : ''}</td></tr></table>`;
+    if (f.sinBrecha) { h += `<table><tr><td class="k">Resultado</td><td>Sin brecha identificada</td></tr><tr><td class="k">Observaciones</td><td>${val(f.obs, true)}</td></tr></table>` + cajaValidacion(''); h += '</section>'; return; }
+    if (!f.brechas.length) { h += '<p class="pend">Sin hallazgos capturados.</p></section>'; return; }
+    if (f.consolidado) h += `<table><tr><th>Priorización consolidada</th>${CRN.map(c => `<th>${c}</th>`).join('')}<th>Puntaje</th><th>Grado</th></tr><tr><td>Para la matriz oficial</td>${f.consolidado.niveles.map(x => `<td>${x}</td>`).join('')}<td>${f.consolidado.puntaje}</td><td><b>${f.consolidado.grado}</b></td></tr></table>`;
+    f.brechas.forEach((b, i) => {
+      const per = b.inicio || b.fin ? `Del ${fFecha(b.inicio) || '—'} al ${fFecha(b.fin) || '—'}` : '';
+      h += `<div class="hz"><h3>Hallazgo ${i + 1}${b.campos < b.total ? ` <span class="pend">· ${b.total - b.campos} campo(s) pendiente(s)</span>` : ' · completo'}</h3>
+      <table>
+        <tr><td class="k">Hallazgo / brecha</td><td>${val(b.hallazgo, true)}</td></tr>
+        <tr><td class="k">Componentes relacionados</td><td>${b.componentes.length ? esc(b.componentes.join('; ')) : '<span class="pend">Pendiente</span>'}</td></tr>
+        <tr><td class="k">Origen</td><td>${esc(b.origen || '—')}</td></tr>
+      </table>
+      <table><tr><th style="width:18%">Criterio</th><th style="width:14%">Categoría</th><th>Análisis</th></tr>
+        ${b.crit.map((c, j) => `<tr><td>${CRN[j]}</td><td>${c.nivel ? esc(c.nivel) : '<span class="pend">Pendiente</span>'}</td><td>${val(c.desc, true)}</td></tr>`).join('')}
+        <tr><td><b>Puntaje / grado</b></td><td colspan="2">${b.puntaje ? `<b>${b.puntaje}/12 · ${b.grado}</b>` : '<span class="pend">Incompleto</span>'}</td></tr></table>
+      <table>
+        <tr><td class="k">Justificación</td><td>${val(b.justificacion, true)}</td></tr>
+        <tr><td class="k">Objetivo (¿Qué?)</td><td>${val(b.objetivo, true)}</td></tr>
+        <tr><td class="k">Estrategias (¿Cómo?)</td><td>${val(b.estrategias, true)}</td></tr>
+        <tr><td class="k">Responsables (¿Quién?)</td><td>${val(b.responsables, true)}</td></tr>
+        <tr><td class="k">Alianzas</td><td>${val(b.alianzas)}</td></tr>
+        <tr><td class="k">Periodo</td><td>${per ? esc(per) : '<span class="pend">Pendiente</span>'}</td></tr>
+        <tr><td class="k">Tipo de recursos</td><td>${b.recTipos.length ? esc(b.recTipos.join(', ')) : '<span class="pend">Pendiente</span>'}</td></tr>
+        <tr><td class="k">Recursos disponibles</td><td>${val(b.recDisponibles)}</td></tr>
+        <tr><td class="k">Recursos por gestionar</td><td>${val(b.recGestionar)}</td></tr>
+      </table>
+      <p class="meta">Última edición: ${esc(b.ultimoPor || '—')}${b.ultimo ? ' · ' + fHora(b.ultimo) : ''}${b.editando ? ' · en edición por ' + esc(b.editando) : ''}</p>
+      ${cajaValidacion('Hallazgo ' + (i + 1))}</div>`;
+    });
+    h += '</section>';
+  });
+  h += `<h2>Dictamen general</h2><div class="val">☐ Se valida la captura &nbsp;&nbsp; ☐ Se valida con ajustes &nbsp;&nbsp; ☐ No se valida<br>Observaciones generales:<div class="lin"></div><div class="lin"></div><div class="lin"></div></div>
+  <div class="firmas"><div>Elaboró<br>Líder distrital · ${esc(d.jur)}</div><div>Revisó<br>Gerencia y Rectoría en Salud</div><div>Validó<br>Coordinación Estatal SNSP ${esc(d.entidad || 'Morelos')}</div></div>`;
+  return h;
+}
+async function generarInforme() {
+  const b = $('btnInf'); if (!selJur) return;
+  b.disabled = true; b.textContent = 'Generando…';
+  try {
+    const d = await api({action:'informe', jur:selJur, pin:PIN});
+    if (!d || !d.ok) throw new Error((d && d.msg) || 'sin respuesta');
+    INF = d;
+    $('infHoja').innerHTML = informeHTML(d);
+    $('infTit').textContent = 'Informe para validación · ' + d.jur;
+    $('informe').classList.remove('hide'); document.body.style.overflow = 'hidden'; $('informe').scrollTop = 0;
+  } catch (e) { alertaMin('No se pudo generar el informe: ' + e.message); }
+  b.disabled = false; b.textContent = '📄 Informe para validación';
+}
+function alertaMin(m) { $('upd').textContent = m; }
+$('infClose').addEventListener('click', () => { $('informe').classList.add('hide'); document.body.style.overflow = ''; });
+$('infPrint').addEventListener('click', () => { try { window.print(); } catch (e) {} });
+$('infWord').addEventListener('click', () => {
+  if (!INF) return;
+  const css = `body{font-family:Arial,sans-serif;font-size:10.5pt;color:#24191C}h1{font-size:18pt;color:#701631;margin:0}h2{font-size:13pt;color:#701631;border-bottom:1px solid #ccc;margin-top:16pt}h3{font-size:11pt;margin:10pt 0 4pt}table{border-collapse:collapse;width:100%;margin:4pt 0 8pt}th,td{border:1px solid #bbb;padding:3pt 5pt;vertical-align:top;font-size:9.5pt;text-align:left}th{background:#f3eee6}.k{background:#faf7f3;font-weight:bold;width:26%}.pend{color:#9b2c2c;font-weight:bold}.meta{color:#6B5F62;font-size:9pt}.val{border:1px dashed #999;padding:6pt;margin:4pt 0 10pt}.lin{border-bottom:1px solid #999;height:14pt}.encab img{height:40pt}.firmas div{display:inline-block;width:30%;margin:30pt 1% 0;border-top:1px solid #333;text-align:center;font-size:9pt;padding-top:4pt}.fesp{page-break-before:always}`;
+  const html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word"><head><meta charset="utf-8"><title>Informe para validación</title><style>${css}</style></head><body>${informeHTML(INF)}</body></html>`;
+  const blob = new Blob(['\ufeff', html], {type: 'application/msword'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = 'Informe_validacion_FESP_' + INF.jur.replace(/[^A-Za-z0-9ÁÉÍÓÚáéíóúÑñ]+/g, '_') + '.doc';
+  document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1500);
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('informe').classList.contains('hide')) $('infClose').click(); });
 
 async function detalle(scroll) {
   if (!selJur) return;
@@ -239,3 +382,4 @@ cargar();
 </script>
 </body>
 </html>
+
