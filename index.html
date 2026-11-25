@@ -129,6 +129,37 @@ footer{font-size:11.5px;color:var(--mu);padding:8px 16px 24px;max-width:920px;ma
 .brecha.locked .bbody input,.brecha.locked .bbody textarea{background:#f7f3f2;cursor:not-allowed}
 .brecha.mio{box-shadow:0 0 0 2px rgba(174,133,30,.35)}
 .secnav button.otro::after{content:"";position:absolute;top:-2px;right:-2px;width:10px;height:10px;border-radius:50%;background:#2b6cb0;border:2px solid #fff}
+/* ===== Contraseñas por FESP ===== */
+.acc{border-radius:10px;padding:10px 12px;margin:8px 0 4px;font-size:13.5px}
+.acc.si{background:#eef5ef;border:1px solid #c6dccb;color:#24543a}
+.acc.no{background:#fdf6e9;border:1px solid #ecd9b0;color:#6b4e00}
+.acc .row{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+.acc input{flex:1 1 160px;padding:10px 11px;border:1px solid #cfc6b8;border-radius:9px;font:inherit;letter-spacing:2px;text-transform:uppercase}
+.acc .msg{font-size:12.5px;color:var(--lo);margin-top:4px;min-height:16px}
+#fespBlocks > .card.ro{border-style:dashed}
+#fespBlocks > .card.ro .brecha{background:#fbfaf8}
+.secnav button.ro{border-style:dashed;opacity:.75}
+.secnav button.ro::before{content:"🔒";position:absolute;bottom:-6px;left:-4px;font-size:10px}
+/* ===== Revisión del líder distrital ===== */
+.revp{border-radius:12px;padding:12px 14px;margin:16px 0 4px;font-size:13.5px;border:1.5px solid var(--ln);background:#faf7f3}
+.revp .rt{font-weight:700;color:var(--g);margin-bottom:4px}
+.revp.validada{background:#eef5ef;border-color:#9fcbb0}
+.revp.ajustes{background:#fdecea;border-color:#e9b7b7}
+.revp.corregida{background:#fdf6e9;border-color:#ecd9b0}
+.revp .est{font-weight:700}
+.revp textarea{min-height:60px;margin-top:8px}
+.revp .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.revp .bok{background:linear-gradient(135deg,#3a9663,#2e7d4f);color:#fff}
+.revp .baj{background:#fff;color:#9b2c2c;border:1.5px solid #9b2c2c}
+.secnav button.vok{outline:2.5px solid #2e7d4f;outline-offset:2px}
+.secnav button.vaj{outline:2.5px solid #9b2c2c;outline-offset:2px}
+.secnav button.vco{outline:2.5px dashed #b7791f;outline-offset:2px}
+table.rg{width:100%;border-collapse:collapse;font-size:13px;margin:8px 0 14px}
+table.rg th,table.rg td{border:1px solid var(--ln);padding:7px 8px;text-align:left;vertical-align:middle}
+table.rg th{background:#f3eee6}
+table.rg .btn{padding:6px 10px;min-height:34px;font-size:12.5px}
+.chipR{display:inline-block;border-radius:999px;padding:2px 10px;font-size:12px;font-weight:700;white-space:nowrap}
+.chipR.pend{background:#efe9e1;color:#8a7f75}.chipR.validada{background:#dff0e5;color:#2e7d4f}.chipR.ajustes{background:#fdecea;color:#9b2c2c}.chipR.corregida{background:#fbecc9;color:#7a4e0b}
 /* ===== Dinámica de la interfaz ===== */
 /* ===== Plantilla institucional (igual que ÁGORA) ===== */
 .greca{height:34px;background:#701631 repeat-x left center;background-size:auto 100%}
@@ -273,6 +304,9 @@ section.anim.back{animation-name:entraIzq}
           <input type="date" id="fechaEval"><div class="err">Campo obligatorio.</div></div>
         <div data-f="participantes"><label class="f">Personal participante en el análisis</label>
           <input type="text" id="participantes" placeholder="Cargos o áreas que participaron"></div>
+        <div data-f="clave" id="claveBox" class="hide"><label class="f">Contraseña de su equipo</label>
+          <input type="password" id="clave" autocomplete="off" placeholder="Clave de su FESP o clave maestra">
+          <p class="hint" style="margin-top:4px">Con la clave de su FESP podrá editarla; las demás las verá en solo lectura. Puede agregar otra clave dentro de cada FESP.</p></div>
       </div>
     </div>
     <div class="nav"><span></span><button class="btn bp" onclick="go(2)">Continuar <span class="ar">→</span></button></div>
@@ -340,10 +374,93 @@ const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;',
 function toast(m){const t=$('toast');t.textContent=m;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),2600)}
 function grado(p){if(!p)return '';return p>=9?'Alta':p>=5?'Media':'Baja'}
 
+/* ---------- contraseñas por FESP ---------- */
+const ACC={jur:'',claves:[],all:false,fesp:new Set(),equipos:[]};
+function clavesActivas(){return !!CONFIG.claves&&(IS_GAS||!!API_URL)}
+const REV={};
+function esLider(){return !clavesActivas()||ACC.all}
+function revEstado(n){return (REV[n]&&REV[n].estado)||''}
+function tieneClave(n){return !clavesActivas()||ACC.all||ACC.fesp.has(+n)}
+function puedeEditar(n){return tieneClave(n)&&(esLider()||revEstado(n)!=='validada')}
+const REV_TXT={'':'Pendiente de revisión',validada:'Validada',ajustes:'Requiere ajustes',corregida:'Corregida · pendiente de revisión'};
+function fechaHora(ms){return ms?new Date(ms).toLocaleString('es-MX',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}):''}
+function renderRev(b){
+  const n=+b.dataset.n;let box=b.querySelector('.revp');
+  if(!LIVE.on){if(box)box.remove();return}
+  if(!box){box=document.createElement('div');b.appendChild(box)}
+  const r=REV[n]||{},e=r.estado||'';
+  if(box.querySelector('textarea')&&box.querySelector('textarea')===document.activeElement)return;
+  let det='';
+  if(e==='validada')det=`✓ Validada por <b>${esc(r.por||'')}</b> · ${fechaHora(r.ts)}${r.obs?`<br>Observaciones: ${esc(r.obs)}`:''}${esLider()?'':'<br>La FESP queda en solo lectura para el equipo.'}`;
+  else if(e==='ajustes')det=`⚠ <b>${esc(r.por||'')}</b> solicitó ajustes · ${fechaHora(r.ts)}<br><b>Observaciones:</b> ${esc(r.obs||'')}`;
+  else if(e==='corregida')det=`↻ Corregida por <b>${esc(r.corregidaPor||'')}</b> · ${fechaHora(r.tsCorr)}. Ajustes solicitados: ${esc(r.obs||'')}<br>Pendiente de nueva revisión del líder distrital.`;
+  else det='Esta FESP aún no ha sido revisada por el líder distrital.';
+  box.className='revp '+e;
+  box.innerHTML=`<div class="rt">Revisión del líder distrital · <span class="est">${REV_TXT[e]}</span></div><div>${det}</div>`+
+   (esLider()?`<textarea placeholder="Observaciones de la revisión (obligatorias para solicitar ajustes)">${esc(r.obs||'')}</textarea>
+    <div class="row"><button type="button" class="btn bok" onclick="revisar(${n},'validada')">✓ Validar FESP</button>
+    <button type="button" class="btn baj" onclick="revisar(${n},'ajustes')">⚠ Solicitar ajustes</button>
+    ${e?`<button type="button" class="btn bs" onclick="revisar(${n},'')">Quitar revisión</button>`:''}</div>`:'');
+}
+function renderRevTodas(){bloques().forEach(renderRev);if(cur===3)buildResumen()}
+function revisar(n,estado){
+  if(!esLider()){toast('Solo el líder distrital (clave maestra) puede revisar.');return}
+  if(!LIVE.on){toast('La revisión requiere conexión con el servidor.');return}
+  const b=$('fb'+n),ta=b?b.querySelector('.revp textarea'):null,obs=(ta?ta.value:((REV[n]||{}).obs||'')).trim();
+  if(estado==='ajustes'&&!obs){toast('Escriba las observaciones para el equipo antes de solicitar ajustes.');if(ta)ta.focus();return}
+  const data={estado,obs};REV[n]=Object.assign({},data,{por:liveUser(),ts:Date.now()});
+  LIVE.pend['r:'+n]=()=>data;clearTimeout(LIVE.saveT);liveFlush();
+  refrescarBloqueos();renderRevTodas();renderNav();
+  toast(estado==='validada'?`FESP ${n} validada.`:estado==='ajustes'?`Se solicitaron ajustes en la FESP ${n}.`:`Se quitó la revisión de la FESP ${n}.`);
+}
+function irASeccion(n){if(cur!==2)go(2);const i=bloques().findIndex(b=>+b.dataset.n===+n);if(i>=0)showSec(i+1)}
+function accGuardar(){try{sessionStorage.setItem('fesp_acc_'+ACC.jur,JSON.stringify({claves:ACC.claves,all:ACC.all,fesp:[...ACC.fesp],equipos:ACC.equipos}))}catch(e){}}
+function accCargar(jur){
+  if(ACC.jur===jur)return;ACC.jur=jur;ACC.claves=[];ACC.all=false;ACC.fesp=new Set();ACC.equipos=[];
+  try{const d=JSON.parse(sessionStorage.getItem('fesp_acc_'+jur)||'null');if(d){ACC.claves=d.claves||[];ACC.all=!!d.all;ACC.fesp=new Set(d.fesp||[]);ACC.equipos=d.equipos||[]}}catch(e){}
+}
+async function validarClave(clave,silencio){
+  clave=String(clave||'').trim().toUpperCase();if(!clave)return {ok:false,msg:'Escriba la contraseña.'};
+  const jur=payload().ident.jurisdiccion;accCargar(jur);
+  let r;try{r=await apiLiveCall({action:'acceso',jur,clave})}catch(e){r={ok:false,msg:'Sin conexión con el servidor.'}}
+  if(r&&r.ok){
+    if(ACC.claves.indexOf(clave)<0)ACC.claves.push(clave);
+    if(r.all)ACC.all=true;(r.fesp||[]).forEach(n=>ACC.fesp.add(+n));if(r.equipo&&ACC.equipos.indexOf(r.equipo)<0)ACC.equipos.push(r.equipo);
+    accGuardar();refrescarBloqueos();progreso();
+    if(!silencio)toast(r.all?'Clave maestra: puede editar y enviar todas las FESP de su Jurisdicción.':`Acceso concedido: FESP ${(r.fesp||[]).join(', ')}.`);
+    if(LIVE.on){liveQueueAll();liveFlush()}
+  }
+  return r||{ok:false,msg:'Sin respuesta'};
+}
+async function desbloquearFesp(n){
+  const fb=$('fb'+n),inp=fb.querySelector('.acc input'),msg=fb.querySelector('.acc .msg');
+  msg.textContent='Verificando…';const r=await validarClave(inp.value);
+  if(!r.ok){msg.textContent=r.msg||'Contraseña incorrecta.';return}
+  if(!puedeEditar(n)){msg.textContent=`Esa clave es de la(s) FESP ${(r.fesp||[]).join(', ')}, no de esta.`;return}
+}
+function accPanel(b){
+  const n=+b.dataset.n,box=b.querySelector('.acc');if(!box)return;
+  if(!clavesActivas()){box.classList.add('hide');return}
+  box.classList.remove('hide');const ed=puedeEditar(n);
+  if(!ed&&tieneClave(n)&&revEstado(n)==='validada'){box.className='acc si';box.innerHTML='✓ <b>FESP validada por el líder distrital.</b> Queda en solo lectura; si requiere un cambio, solicítelo al líder.';return}
+  if(ed){box.className='acc si';box.innerHTML=`✓ <b>Usted puede editar esta FESP</b>${ACC.all?' (clave maestra)':''}.`;return}
+  if(box.classList.contains('no')&&box.querySelector('input'))return;
+  box.className='acc no';
+  box.innerHTML=`🔒 <b>Solo lectura.</b> Esta FESP la captura su equipo responsable. Para editarla, escriba la contraseña de la FESP ${n}.
+    <div class="row"><input type="password" autocomplete="off" aria-label="Contraseña FESP ${n}" onkeydown="if(event.key==='Enter'){event.preventDefault();desbloquearFesp(${n})}"><button type="button" class="btn bs" onclick="desbloquearFesp(${n})">Desbloquear</button></div><div class="msg"></div>`;
+}
+function refrescarBloqueos(){
+  bloques().forEach(b=>{const n=+b.dataset.n,ro=!puedeEditar(n);b.classList.toggle('ro',ro);
+    b.querySelectorAll('.sb,.obs,.bwrap > .btn').forEach(x=>x.disabled=ro);accPanel(b);renderRev(b)});
+  document.querySelectorAll('.fesp-opt').forEach(o=>{const n=+o.id.slice(3);o.querySelector('input').disabled=!puedeEditar(n)});
+  liveApplyLocks();
+}
+
 /* ---------- captura en vivo ---------- */
 const LIVE={on:false,jur:'',sid:'s'+Math.random().toString(36).slice(2,10),since:0,locks:{},pres:[],pend:{},saveT:null,pollT:null,applying:false,mine:new Set(),estado:''};
 function liveDisponible(){return CONFIG.live!==false&&(IS_GAS||!!API_URL)}
 function apiLiveCall(o){
+  if(typeof ACC!=='undefined'&&ACC.claves.length&&!o.claves)o.claves=ACC.claves;
   if(IS_GAS) return new Promise((res,rej)=>google.script.run.withSuccessHandler(res).withFailureHandler(rej).apiLive(o));
   return fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(o)}).then(r=>r.json());
 }
@@ -365,6 +482,7 @@ function applyItems(items){
       if(sb.checked!==!!d.sinBrecha){sb.checked=!!d.sinBrecha;toggleSinBrecha(n)}
       if(document.activeElement!==ob)ob.value=d.obs||'';
     });
+    items.filter(i=>i.key.indexOf('r:')===0).forEach(i=>{REV[+i.key.slice(2)]=i.data||{}});
     items.filter(i=>i.key.indexOf('b:')===0).sort((a,b)=>((a.data||{}).orden||0)-((b.data||{}).orden||0)).forEach(i=>{
       const p=i.key.split(':'),n=+p[1],gid=p[2],d=i.data||{};let el=document.querySelector(`.brecha[data-gid="${gid}"]`);
       if(d.deleted){if(el){el.remove();if($('fb'+n)){renumber(n);calcFesp(n)}}return}
@@ -375,9 +493,10 @@ function applyItems(items){
   }finally{LIVE.applying=false}
   if(cur===2){const bl=bloques();if(curN){const i=bl.findIndex(b=>b.dataset.n===curN);sec=i>=0?i+1:Math.min(sec,bl.length)}
     bl.forEach((b,k)=>b.classList.toggle('hide',k+1!==sec));$('selCard').classList.toggle('hide',sec!==0)}
-  estadosBrecha();renderNav();progreso();autosave();
+  [...LIVE.mine].forEach(k=>{const n=k.split(':')[1];if(!puedeEditar(n)){LIVE.mine.delete(k);apiLiveCall({action:'lock',jur:LIVE.jur,sid:LIVE.sid,key:k,on:false}).catch(()=>{})}});
+  estadosBrecha();refrescarBloqueos();renderNav();progreso();autosave();if(cur===3)buildResumen();
 }
-function liveQueue(key,fn){if(!LIVE.on||LIVE.applying)return;LIVE.pend[key]=fn;clearTimeout(LIVE.saveT);LIVE.saveT=setTimeout(liveFlush,1200);liveEstado('Guardando…')}
+function liveQueue(key,fn){if(!LIVE.on||LIVE.applying)return;if(!puedeEditar(String(key).split(':')[1]))return;LIVE.pend[key]=fn;clearTimeout(LIVE.saveT);LIVE.saveT=setTimeout(liveFlush,1200);liveEstado('Guardando…')}
 function liveQueueB(el){liveQueue(liveKeyB(el),()=>readBrecha(el))}
 function liveQueueF(n){liveQueue('f:'+n,()=>{const fb=$('fb'+n);return fb?{sel:true,sinBrecha:fb.querySelector('.sb').checked,obs:fb.querySelector('.obs').value.trim()}:{sel:false}})}
 function liveQueueAll(){bloques().forEach(b=>{liveQueueF(+b.dataset.n);b.querySelectorAll('.brecha').forEach(liveQueueB)})}
@@ -386,7 +505,7 @@ async function liveFlush(){
   if(!LIVE.on)return;const items=liveItemsPendientes();if(!items.length)return;
   try{const r=await apiLiveCall({action:'liveSave',jur:LIVE.jur,sid:LIVE.sid,user:liveUser(),items});
     if(!r||!r.ok)throw new Error('x');
-    (r.rechazados||[]).forEach(x=>toast(`${x.holder} está editando ese hallazgo; su cambio no se guardó.`));
+    (r.rechazados||[]).forEach(x=>toast(x.validada?'Esa FESP ya fue validada por el líder distrital; su cambio no se guardó.':x.soloLider?'Solo el líder distrital puede registrar la revisión.':x.sinAcceso?'No tiene contraseña para esa FESP; su cambio no se guardó.':`${x.holder} está editando ese hallazgo; su cambio no se guardó.`));
     liveEstado('Guardado en vivo · '+horaCorta());
   }catch(e){items.forEach(it=>{if(!LIVE.pend[it.key])LIVE.pend[it.key]=()=>it.data});liveEstado('Sin conexión · reintentando');clearTimeout(LIVE.saveT);LIVE.saveT=setTimeout(liveFlush,5000)}
 }
@@ -400,6 +519,7 @@ async function liveStart(){
   LIVE.since=r.now-3000;
   if((r.items||[]).length){
     resetCaptura();applyItems(r.items);
+    const conocidas=new Set(r.items.map(i=>String(i.key).split(':')[1]));aplicarPrecarga(conocidas);
     bn.innerHTML=`<b>Captura en vivo · ${esc(jur)}.</b><br>Se cargó lo que el equipo ya integró (${document.querySelectorAll('.brecha').length} hallazgos). Los cambios de las demás personas aparecen solos; un hallazgo que otra persona está editando se muestra bloqueado.`;
     bn.classList.remove('hide');
   }else{
@@ -427,7 +547,8 @@ function liveApplyLocks(){
   document.querySelectorAll('.brecha').forEach(el=>{const k=liveKeyB(el),l=LIVE.locks[k],otro=!!(l&&l.sid!==LIVE.sid);
     el.classList.toggle('locked',otro);el.classList.toggle('mio',LIVE.mine.has(k));
     const b=el.querySelector('.blk');b.classList.toggle('hide',!otro);if(otro)b.textContent='🔒 '+l.name+' está editando';
-    el.querySelectorAll('.bbody input,.bbody textarea,.bbody select,.bbody button,.bh .bl').forEach(x=>x.disabled=otro);
+    const fb=el.closest('[data-n]'),ro=fb?!puedeEditar(+fb.dataset.n):false;
+    el.querySelectorAll('.bbody input,.bbody textarea,.bbody select,.bbody button,.bh .bl').forEach(x=>x.disabled=otro||ro);
     if(otro&&el.contains(document.activeElement))document.activeElement.blur();});
 }
 function liveEstado(t){LIVE.estado=t;livePresRender()}
@@ -446,7 +567,7 @@ async function liveOnFocus(e){
   LIVE.mine.add(k);liveApplyLocks();
   try{const r=await apiLiveCall({action:'lock',jur:LIVE.jur,sid:LIVE.sid,user:liveUser(),key:k,on:true});
     if(r&&r.locks)LIVE.locks=r.locks;
-    if(!r||!r.ok){LIVE.mine.delete(k);if(r&&r.holder)toast(`${r.holder} está editando este hallazgo.`)}
+    if(!r||!r.ok){LIVE.mine.delete(k);if(r&&r.holder)toast(`${r.holder} está editando este hallazgo.`);if(r&&r.validada)toast('Esta FESP ya fue validada por el líder distrital.')}
     liveApplyLocks();
   }catch(_){}
 }
@@ -473,6 +594,7 @@ function liveSalir(){
 /* ---------- init ---------- */
 function init(){
   if(!IS_GAS && !API_URL) $('demoBar').classList.remove('hide');
+  if(clavesActivas()) $('claveBox').classList.remove('hide');
   const IMG=CONFIG.imagenes||{};
   $('logos').innerHTML=IMG.logo?`<img src="${IMG.logo}" alt="Secretaría de Salud · Servicio Nacional de Salud Pública" onerror="this.parentNode.innerHTML='<span class=logo-txt>Salud · SNSP</span>'">`:'<span class="logo-txt">Salud · SNSP</span>';
   if(IMG.greca) $('greca').style.backgroundImage=`url("${IMG.greca}")`;
@@ -511,6 +633,7 @@ let progT;
 function progreso(){clearTimeout(progT);progT=setTimeout(()=>{
   const p=payload(),i=p.ident;let tot=6,ok=0;
   [i.entidad,i.jurisdiccion,i.capturista,i.cargo,i.correo,i.fechaEval].forEach(v=>{if(v)ok++});
+  if(clavesActivas())p.fesp=p.fesp.filter(f=>puedeEditar(f.n));
   p.fesp.forEach(f=>{
     if(f.sinBrecha){tot++;if(f.obs)ok++;return}
     f.brechas.forEach(b=>{
@@ -535,6 +658,7 @@ function toggleFesp(n,on,opt){
     const d=document.createElement('div');d.className='card';d.id=id;d.dataset.n=n;
     d.innerHTML=`<h2><span class="num">${n}</span>${esc(f.corto)}</h2>
       <p class="hint">${esc(f.nombre)}</p>
+      <div class="acc hide"></div>
       <details class="info"><summary>Descripción y componentes de la FESP</summary><p>${esc(f.desc)}</p><b style="font-size:13px">Principales componentes:</b><ul>${f.comp.map(c=>`<li>${esc(c)}</li>`).join('')}</ul></details>
       <label class="sinb"><input type="checkbox" class="sb" onchange="toggleSinBrecha(${n})"><span><b>No se identificaron brechas en esta FESP</b><br><span class="hint" style="margin:0">Marque solo si la evaluación no arrojó brechas. Registre sus observaciones o áreas de mejora.</span></span></label>
       <div class="sbBox hide" data-f="obs"><label class="f">Observaciones / áreas de mejora <span class="req">*</span></label><textarea class="obs"></textarea><div class="err">Registre la observación.</div></div>
@@ -550,6 +674,7 @@ function toggleFesp(n,on,opt){
   }
   if($('secWrap')){if(cur===2&&sec===0)bloques().forEach(b=>b.classList.add('hide'));renderNav()}
   if(!LIVE.applying) liveQueueF(n);
+  refrescarBloqueos();
   autosave();
 }
 /* ---------- secciones ---------- */
@@ -570,7 +695,8 @@ function estadoFesp(b){
 function renderNav(){
   const bl=bloques();if(sec>bl.length)sec=bl.length;
   $('secNav').innerHTML=`<button type="button" data-i="0" title="Selección de FESP">☰</button>`+
-    bl.map((b,i)=>`<button type="button" data-i="${i+1}" class="${estadoFesp(b)}" title="FESP ${b.dataset.n}">${b.dataset.n}</button>`).join('');
+    bl.map((b,i)=>{const e=revEstado(b.dataset.n),rc={validada:' vok',ajustes:' vaj',corregida:' vco'}[e]||'';
+      return `<button type="button" data-i="${i+1}" class="${estadoFesp(b)}${puedeEditar(b.dataset.n)?'':' ro'}${rc}" title="FESP ${b.dataset.n} · ${REV_TXT[e]}${puedeEditar(b.dataset.n)?'':' · solo lectura'}">${b.dataset.n}</button>`}).join('');
   [...$('secNav').children].forEach(x=>x.classList.toggle('on',+x.dataset.i===sec));
   if(LIVE.on) bl.forEach((b,i)=>{const otros=LIVE.pres.filter(p=>p.sid!==LIVE.sid&&p.sec==='FESP '+b.dataset.n);const bt=$('secNav').children[i+1];
     if(otros.length){bt.classList.add('otro');bt.title='FESP '+b.dataset.n+' · en esta sección: '+otros.map(p=>p.name).join(', ')}});
@@ -693,7 +819,7 @@ function addBrecha(n,data,gid){
   if(data) fillBrecha(u,data);
   renumber(n);calc(u);progreso();
   if(!data&&!LIVE.applying) liveQueueB(el);
-  if(LIVE.on) liveApplyLocks();
+  liveApplyLocks();
   return u;
 }
 function delBrecha(u){
@@ -768,7 +894,7 @@ function val1(){
   return !!ok;
 }
 function val2(){
-  let ok=true;const blocks=[...$('fespBlocks').children];
+  let ok=true;const blocks=[...$('fespBlocks').children].filter(b=>puedeEditar(b.dataset.n));
   $('fespErr').style.display=blocks.length?'none':'block';if(!blocks.length)return false;
   blocks.forEach(b=>{if(b.querySelector('.sb').checked){ok&=mark(b.querySelector('[data-f=obs]'),!b.querySelector('.obs').value.trim());return}
    b.querySelectorAll('.brecha').forEach(el=>{
@@ -790,13 +916,15 @@ function go(n){
   if(n>cur){
     if(cur===1&&!val1()){toast('Revise los campos marcados.');return}
     if(n===3&&!val2()){
-      const e=document.querySelector('#fespBlocks .inv');
-      if(e){const b=e.closest('#fespBlocks > .card'),i=bloques().indexOf(b)+1;showSec(i);const br=e.closest('.brecha');
-        if(br){br.parentElement.querySelectorAll('.brecha.open').forEach(x=>x.classList.remove('open'));br.classList.add('open')}
-        const c=CATALOGO.find(x=>x.n===+b.dataset.n);toast(`Faltan campos en la FESP ${c.n}. Se abrió la sección para completarlos.`);
-        setTimeout(()=>e.scrollIntoView({behavior:'smooth',block:'center'}),350);}
-      else toast('Seleccione al menos una FESP.');
-      return}
+      if(LIVE.on&&bloques().length){toast('Hay campos pendientes: puede revisar, pero no enviar hasta completarlos.')}
+      else{irAPendiente();return}
+    }
+  }
+  if(n===2&&cur===1&&clavesActivas()){
+    accCargar(payload().ident.jurisdiccion);const cv=$('clave').value.trim();
+    if(cv)validarClave(cv).then(r=>{if(!r.ok)toast(r.msg||'Contraseña incorrecta.');else $('clave').value=''});
+    else if(!ACC.claves.length)setTimeout(()=>toast('Sin contraseña: verá las FESP en solo lectura. Escriba la clave de su FESP para editarla.'),900);
+    setTimeout(refrescarBloqueos,50);
   }
   if(n===2&&cur===1){
     if(liveDisponible()){const j=payload().ident.jurisdiccion;if(!LIVE.on||LIVE.jur!==j) setTimeout(liveStart,0)}
@@ -810,37 +938,56 @@ function go(n){
   liveReleaseClosed();
   if(n===2) showSec(prev===1?(bloques().length&&$('precargaBanner').textContent&&!$('precargaBanner').classList.contains('hide')?1:sec):sec,prev>2);
 }
-function aplicarPrecarga(){
+function aplicarPrecarga(omitir){
   const jur=payload().ident.jurisdiccion,pre=(CONFIG.precarga||{})[jur],bn=$('precargaBanner');
-  if(!pre){bn.classList.add('hide');return}
-  if($('fespBlocks').children.length){return}
+  if(!pre){if(!omitir)bn.classList.add('hide');return}
+  if(!omitir&&$('fespBlocks').children.length){return}
   let nb=0;
   Object.keys(pre).map(Number).sort((a,b)=>a-b).forEach(n=>{
+    if(omitir&&(omitir.has(String(n))||$('fb'+n)))return;
     const f=pre[n],o=$('opt'+n);if(!o)return;
     o.querySelector('input').checked=true;o.classList.add('sel');
     toggleFesp(n,true,{empty:true});
     if(f.sinBrecha){setSinBrecha(n,f.obs)}
     else f.brechas.forEach((b,i)=>{addBrecha(n,{hallazgo:b.hallazgo,hallOrig:b.hallazgo,componentes:b.componentes,orden:i+1},`p${n}-${i+1}`);nb++});
   });
+  if(omitir){refrescarBloqueos();return}
   bn.innerHTML=`<b>Se precargaron ${nb} hallazgos de la evaluación FESP de ${esc(jur)}.</b><br>Revise cada hallazgo, confirme los componentes relacionados y complete la priorización y el plan de acción. Puede editar, eliminar o agregar brechas.`;
-  bn.classList.remove('hide');autosave();
+  bn.classList.remove('hide');refrescarBloqueos();autosave();
 }
+function payloadEnvio(){const p=payload();p.fesp=p.fesp.filter(f=>puedeEditar(f.n));if(clavesActivas())p.claves=ACC.claves;return p}
 function buildResumen(){
-  const p=payload(),i=p.ident;let rows='';
+  const p=payloadEnvio(),i=p.ident;let rows='';
   p.fesp.forEach(f=>{const c=CATALOGO.find(x=>x.n===f.n);
     if(f.sinBrecha) rows+=`<tr><td>${f.n}. ${esc(c.corto)}</td><td>—</td><td>${esc(f.obs.slice(0,140))}</td><td>—</td><td><span class="pill">Sin brecha</span></td><td>—</td></tr>`;
     f.brechas.forEach((b,k)=>{
     const pt=CRITERIOS.reduce((s,cr)=>s+(NIVELES.find(x=>x[0]===b.crit[cr.k].nivel)||[0,0])[1],0),g=grado(pt);
     rows+=`<tr><td>${f.n}. ${esc(c.corto)}</td><td>${k+1}</td><td>${esc(b.hallazgo.slice(0,140))}${b.hallazgo.length>140?'…':''}</td><td>${pt}</td><td><span class="pill ${g}">${g}</span></td><td>${esc(b.inicio)} → ${esc(b.fin)}</td></tr>`})});
-  $('resumen').innerHTML=`<p><b>${esc(i.jurisdiccion)}</b> · ${esc(i.entidad)}<br><span class="hint">Captura: ${esc(i.capturista)} (${esc(i.cargo)}) · ${esc(i.correo)} · Sesión: ${esc(i.fechaEval)}</span></p>
+  const EF={pend:'Pendiente',mid:'En proceso',ok:'Completa'};
+  const rg=LIVE.on?`<h3 style="margin:4px 0">Revisión general por FESP</h3><p class="hint">${esLider()?'Como líder distrital puede validar cada FESP o abrirla para revisarla, modificarla o solicitar ajustes; los cambios se guardan en vivo.':'Estado de la revisión del líder distrital de cada FESP.'}</p>
+   <div style="overflow-x:auto"><table class="rg"><tr><th>FESP</th><th>Captura</th><th>Revisión</th><th></th></tr>${bloques().map(b=>{const n=+b.dataset.n,c=CATALOGO.find(x=>x.n===n),e=revEstado(n),r=REV[n]||{};
+     const cap=b.querySelector('.sb').checked?'Sin brecha':(EF[estadoFesp(b)]||'Pendiente');
+     return `<tr><td>${n}. ${esc(c.corto)}</td><td>${cap}</td><td><span class="chipR ${e||'pend'}">${REV_TXT[e]}</span>${r.por&&e?`<br><span class="hint" style="margin:0">${esc(r.por)} · ${fechaHora(r.ts)}</span>`:''}</td>
+       <td style="white-space:nowrap"><button type="button" class="btn bs" onclick="irASeccion(${n})">${esLider()?'Revisar':'Ver'}</button>${esLider()&&e!=='validada'?` <button type="button" class="btn bp" onclick="revisar(${n},'validada')">✓ Validar</button>`:''}</td></tr>`}).join('')}</table></div>`:'';
+  $('resumen').innerHTML=rg+`<p><b>${esc(i.jurisdiccion)}</b> · ${esc(i.entidad)}<br><span class="hint">Captura: ${esc(i.capturista)} (${esc(i.cargo)}) · ${esc(i.correo)} · Sesión: ${esc(i.fechaEval)}</span></p>
    <div style="overflow-x:auto"><table class="res"><tr><th>FESP</th><th>Brecha</th><th>Hallazgo</th><th>Puntaje</th><th>Grado</th><th>Periodo</th></tr>${rows}</table></div>`;
+}
+
+function irAPendiente(){
+  const e=document.querySelector('#fespBlocks .inv');
+  if(e){const b=e.closest('#fespBlocks > .card'),i=bloques().indexOf(b)+1;if(cur!==2)go(2);showSec(i);const br=e.closest('.brecha');
+    if(br){br.parentElement.querySelectorAll('.brecha.open').forEach(x=>x.classList.remove('open'));br.classList.add('open')}
+    const c=CATALOGO.find(x=>x.n===+b.dataset.n);toast(`Faltan campos en la FESP ${c.n}. Se abrió la sección para completarlos.`);
+    setTimeout(()=>e.scrollIntoView({behavior:'smooth',block:'center'}),350);}
+  else toast(clavesActivas()&&!bloques().some(b=>puedeEditar(b.dataset.n))?'No tiene contraseña para ninguna FESP editable: escríbala en la sección de su FESP para poder enviar.':'Seleccione al menos una FESP.');
 }
 
 /* ---------- submit ---------- */
 function enviar(){
   if(!$('conf').checked){toast('Confirme la validación de la información.');return}
+  if(!val2()){irAPendiente();return}
   const b=$('btnEnviar');b.disabled=true;b.innerHTML='<span class="spin"></span> Enviando…';
-  const data=payload();
+  const data=payloadEnvio();
   const done=r=>{b.disabled=false;b.innerHTML='Enviar registro <span class="ar">➤</span>';
     if(r&&r.ok){$('folio').textContent=r.folio;try{localStorage.removeItem(LS_KEY)}catch(e){}go(4);[...$('steps').children].forEach(s=>s.className='done')}
     else toast('No se pudo registrar: '+((r&&r.msg)||'error desconocido'))};
