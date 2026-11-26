@@ -104,6 +104,9 @@ footer img{height:70px;width:auto}
 .hoja{max-width:860px;margin:18px auto 40px;background:#fff;box-shadow:0 4px 24px rgba(0,0,0,.12);padding:34px 40px;font-size:13px;line-height:1.45}
 .hoja .encab{display:flex;align-items:center;justify-content:space-between;gap:12px;border-bottom:3px solid var(--o);padding-bottom:10px;margin-bottom:14px}
 .hoja .encab img{height:44px}
+.hoja table.pag{width:100%;border-collapse:collapse;margin:0}
+.hoja table.pag>thead>tr>td,.hoja table.pag>tbody>tr>td{border:0;padding:0;background:none}
+.hoja .encjur{display:none}
 .hoja h1{font-size:22px;margin:0 0 2px}
 .hoja h2{font-family:"Noto Serif",Georgia,serif;color:var(--g);font-size:17px;margin:22px 0 8px;border-bottom:1px solid var(--ln);padding-bottom:4px}
 .hoja h3{font-size:14px;margin:14px 0 6px;color:var(--tx)}
@@ -133,6 +136,10 @@ footer img{height:70px;width:auto}
  .hoja .firmas [contenteditable]{background:none!important;box-shadow:none!important}
  .hoja{box-shadow:none;margin:0;max-width:none;padding:0}
  .hoja .fesp{break-before:page}
+ .hoja table.pag>thead{display:table-header-group}
+ .hoja .encab{margin-bottom:10px}
+ .hoja .encjur{display:inline;font-size:10px;color:#6B5F62}
+ @page{@bottom-right{content:"Página " counter(page) " de " counter(pages);font-family:Arial,sans-serif;font-size:8pt;color:#6B5F62}}
  .hoja .val,.hoja table{break-inside:avoid}
  .hoja h3{break-after:avoid}
  @page{size:letter;margin:16mm 14mm}
@@ -293,7 +300,8 @@ function informeHTML(d) {
     valido: {nombre: '', cargo: 'Coordinación Estatal SNSP ' + (d.entidad || 'Morelos')}}, d.firmas || {});
   const sel = d.fesp.filter(f => f.sel);
   const nH = sel.reduce((a, f) => a + f.brechas.length, 0), nOk = sel.reduce((a, f) => a + f.brechas.filter(b => b.campos === b.total).length, 0);
-  let h = `<div class="encab">${IMG.logo ? `<img src="${abs(IMG.logo)}" alt="Salud · SNSP">` : '<b style="color:#701631">Salud · SNSP</b>'}<div style="text-align:right;font-size:12px;color:#4A3B3F"><b style="color:#701631">Coordinación Estatal ${esc(d.entidad || 'Morelos')}</b><br>Servicio Nacional de Salud Pública</div></div>
+  const encab = `<div class="encab">${IMG.logo ? `<img src="${abs(IMG.logo)}" alt="Salud · SNSP">` : '<b style="color:#701631">Salud · SNSP</b>'}<div style="text-align:right;font-size:12px;color:#4A3B3F"><b style="color:#701631">Coordinación Estatal ${esc(d.entidad || 'Morelos')}</b><br>Servicio Nacional de Salud Pública<br><span class="encjur">Informe para validación · ${esc(d.jur)}</span></div></div>`;
+  let h = `
   <div class="meta" style="text-transform:uppercase;letter-spacing:.6px;color:#AE851E;font-weight:700">Informe de captura para validación</div>
   <h1 style="font-family:'Noto Serif',Georgia,serif;color:#701631">Plan de Acción para el Fortalecimiento de las FESP</h1>
   <div style="font-size:15px;font-weight:600">${esc(d.jur)}</div>
@@ -342,7 +350,8 @@ function informeHTML(d) {
   <p class="nota-ed noimp">✎ Puede corregir los nombres y cargos de las firmas haciendo clic sobre ellos antes de imprimir o descargar. Para dejarlos fijos, cámbielos en la hoja «Configuración» (firmaElaboro, firmaReviso, firmaValido).</p>
   <div class="firmas">${[['Elaboró', F.elaboro], ['Revisó', F.reviso], ['Validó', F.valido]].map(([t, x]) =>
     `<div><span class="ft">${t}</span><span class="fn" contenteditable="true">${esc(x.nombre) || '&nbsp;'}</span><span class="fc" contenteditable="true">${esc(x.cargo) || '&nbsp;'}</span></div>`).join('')}</div>`;
-  return h;
+  // El encabezado va en <thead>: el navegador lo repite en cada hoja al imprimir o guardar PDF
+  return `<table class="pag"><thead><tr><td>${encab}</td></tr></thead><tbody><tr><td>${h}</td></tr></tbody></table>`;
 }
 async function generarInforme() {
   const b = $('btnInf'); if (!selJur) return;
@@ -364,6 +373,8 @@ function hojaParaWord() {
   // Copia de lo que se ve en pantalla (incluye nombres y cargos corregidos a mano)
   const c = $('infHoja').cloneNode(true);
   c.querySelectorAll('.noimp').forEach(e => e.remove());
+  const pg = c.querySelector('table.pag');
+  if (pg) { const e = pg.querySelector('thead td'), b = pg.querySelector('tbody td'); pg.replaceWith(...[...e.childNodes, ...b.childNodes]); }
   c.querySelectorAll('[contenteditable]').forEach(e => e.removeAttribute('contenteditable'));
   return c.innerHTML;
 }
@@ -405,5 +416,6 @@ cargar();
 </script>
 </body>
 </html>
+
 
 
