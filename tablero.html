@@ -116,11 +116,21 @@ footer img{height:70px;width:auto}
 .hoja .lin{border-bottom:1px solid #b9a99c;height:20px}
 .hoja .meta{color:var(--mu);font-size:12px}
 .hoja .firmas{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:40px;text-align:center;font-size:12px}
-.hoja .firmas div{border-top:1px solid #4A3B3F;padding-top:6px}
+.hoja .firmas span{display:block}
+.hoja .firmas .ft{font-weight:700;color:var(--g);margin-bottom:44px}
+.hoja .firmas>div{display:flex;flex-direction:column}
+.hoja .firmas .fn{border-top:1px solid #4A3B3F;padding-top:6px;font-weight:700;min-height:1.2em}
+.hoja .firmas .fc{min-height:1.2em;font-weight:400;color:var(--mu)}
+.hoja .firmas [contenteditable]{outline:none;border-radius:3px}
+.hoja .firmas [contenteditable]:hover{background:#FBF5E6}
+.hoja .firmas [contenteditable]:focus{background:#FBF5E6;box-shadow:0 0 0 2px #E5D3A3}
+.hoja .nota-ed{margin-top:22px;font-size:12px;color:#8A6A14;background:#FBF5E6;border:1px solid #E5D3A3;border-radius:6px;padding:6px 10px}
 @media print{
  body>*:not(#informe){display:none!important}
  #informe{position:static;background:#fff;overflow:visible}
  #informe .bar2{display:none}
+ .noimp{display:none!important}
+ .hoja .firmas [contenteditable]{background:none!important;box-shadow:none!important}
  .hoja{box-shadow:none;margin:0;max-width:none;padding:0}
  .hoja .fesp{break-before:page}
  .hoja .val,.hoja table{break-inside:avoid}
@@ -161,7 +171,7 @@ footer img{height:70px;width:auto}
       <span><i style="background:var(--ok)"></i>Completa</span><span><i style="background:#dbe8f6;border:1px solid #a9c6e8"></i>Sin brecha</span>
       <span><i style="background:#fff;border:1px dashed #ddd2c7"></i>No seleccionada</span>
       <span><i style="background:var(--sin);border-radius:50%"></i>Alguien editando</span><span>✓ Enviada a la matriz</span>
-      <span><i style="background:#fff;outline:2.5px solid var(--ok)"></i>Validada por el líder</span><span><i style="background:#fff;outline:2.5px solid var(--lo)"></i>Requiere ajustes</span><span><i style="background:#fff;outline:2.5px dashed var(--md)"></i>Corregida, por revisar</span>
+      <span><i style="background:#fff;outline:2.5px solid var(--ok)"></i>Validada por la Jefatura</span><span><i style="background:#fff;outline:2.5px solid var(--lo)"></i>Requiere ajustes</span><span><i style="background:#fff;outline:2.5px dashed var(--md)"></i>Corregida, por revisar</span>
     </div>
     <section class="det hide" id="det"></section>
   </div>
@@ -230,7 +240,7 @@ function render(r) {
       <div class="meta">${j.enLinea.length ? `<b style="color:var(--ok)">● ${j.enLinea.length} en línea</b>` : 'Nadie capturando ahora'} · Última actividad ${hace(j.ultimo)}${j.ultimoPor ? ' por ' + esc(j.ultimoPor) : ''}</div>
       ${j.enLinea.length ? `<div class="chips">${j.enLinea.map(p => `<span class="pc">${esc(p.name)} <i>${esc(p.sec || '')}</i></span>`).join('')}</div>` : ''}
       <div class="meta">Enviadas a la matriz: <b>${j.enviadas} de 11</b>${j.ultimoEnvio ? ' · último envío ' + hace(j.ultimoEnvio) : ''}</div>
-      <div class="meta">Revisión del líder: <b>${j.fesp.filter(f => f.revision && f.revision.estado === 'validada').length} de 11 validadas</b>${j.fesp.some(f => f.revision && f.revision.estado === 'ajustes') ? ` · <span style="color:var(--lo);font-weight:700">${j.fesp.filter(f => f.revision && f.revision.estado === 'ajustes').length} con ajustes</span>` : ''}</div>
+      <div class="meta">Revisión de la Jefatura: <b>${j.fesp.filter(f => f.revision && f.revision.estado === 'validada').length} de 11 validadas</b>${j.fesp.some(f => f.revision && f.revision.estado === 'ajustes') ? ` · <span style="color:var(--lo);font-weight:700">${j.fesp.filter(f => f.revision && f.revision.estado === 'ajustes').length} con ajustes</span>` : ''}</div>
       <div class="fg">${j.fesp.map(f => `<div class="fc ${f.estado}${f.revision && f.revision.estado ? ' rv-' + f.revision.estado : ''}" title="FESP ${f.n} · ${esc(f.corto)} · ${EST[f.estado]}${f.revision && f.revision.estado ? ' · revisión: ' + REVT[f.revision.estado] : ''}${f.brechas ? ' · ' + f.brechas + ' hallazgos' : ''}${f.editando.length ? ' · editando: ' + esc(f.editando.join(', ')) : ''}${f.enviada ? ' · enviada' : ''}">${f.n}${f.editando.length ? '<span class="ed"></span>' : ''}${f.enviada ? '<span class="env">✓</span>' : ''}</div>`).join('')}</div>
     </article>`).join('');
   $('grid').querySelectorAll('.jc').forEach(c => {
@@ -258,7 +268,7 @@ function renderDetalle(d) {
     const st = estado(f), ed = f.brechas.filter(b => b.editando).map(b => b.editando);
     return `<details class="fx" data-n="${f.n}"${abiertos.has(f.n) ? ' open' : ''}><summary><span class="num">${f.n}</span><b>${esc(f.corto)}</b>
       <span class="st ${st}">${EST[st]}</span>${revChip(f.revision)}${f.brechas.length ? `<span class="st pend">${f.brechas.length} hallazgos</span>` : ''}${ed.length ? `<span class="ed2">✎ ${esc([...new Set(ed)].join(', '))}</span>` : ''}</summary>
-      ${f.revision && f.revision.obs ? `<div class="revobs"><b>Observaciones del líder:</b> ${esc(f.revision.obs)}</div>` : ''}
+      ${f.revision && f.revision.obs ? `<div class="revobs"><b>Observaciones de la Jefatura:</b> ${esc(f.revision.obs)}</div>` : ''}
       ${f.sinBrecha ? `<div class="obs"><b>Sin brecha identificada.</b> ${esc(f.obs)}</div>` : filas(f)}</details>`;
   }).join('');
   box.querySelectorAll('details.fx').forEach(x => x.addEventListener('toggle', () => { const n = +x.dataset.n; x.open ? abiertos.add(n) : abiertos.delete(n); }));
@@ -277,6 +287,10 @@ function cajaValidacion(n) {
   return `<div class="val"><b>Validación estatal${n ? ' · ' + n : ''}:</b> &nbsp; ☐ Validado &nbsp;&nbsp; ☐ Requiere ajustes<br>Observaciones:<div class="lin"></div><div class="lin"></div></div>`;
 }
 function informeHTML(d) {
+  const F = Object.assign({
+    elaboro: {nombre: '', cargo: 'Jefatura Jurisdiccional · ' + d.jur},
+    reviso: {nombre: '', cargo: 'Líderes FESP'},
+    valido: {nombre: '', cargo: 'Coordinación Estatal SNSP ' + (d.entidad || 'Morelos')}}, d.firmas || {});
   const sel = d.fesp.filter(f => f.sel);
   const nH = sel.reduce((a, f) => a + f.brechas.length, 0), nOk = sel.reduce((a, f) => a + f.brechas.filter(b => b.campos === b.total).length, 0);
   let h = `<div class="encab">${IMG.logo ? `<img src="${abs(IMG.logo)}" alt="Salud · SNSP">` : '<b style="color:#701631">Salud · SNSP</b>'}<div style="text-align:right;font-size:12px;color:#4A3B3F"><b style="color:#701631">Coordinación Estatal ${esc(d.entidad || 'Morelos')}</b><br>Servicio Nacional de Salud Pública</div></div>
@@ -285,7 +299,7 @@ function informeHTML(d) {
   <div style="font-size:15px;font-weight:600">${esc(d.jur)}</div>
   <div class="meta">Generado el ${fHora(d.generado)} con la captura en curso registrada en el servidor. ${nH} hallazgos en ${sel.length} FESP; ${nOk} completos.</div>
   <h2>Resumen por FESP</h2>
-  <table><tr><th>FESP</th><th>Estado de captura</th><th>Hallazgos (completos)</th><th>Priorización consolidada</th><th>Revisión del líder</th><th>Enviada a la matriz</th></tr>
+  <table><tr><th>FESP</th><th>Estado de captura</th><th>Hallazgos (completos)</th><th>Priorización consolidada</th><th>Revisión de la Jefatura</th><th>Enviada a la matriz</th></tr>
   ${d.fesp.map(f => `<tr><td>${f.n}. ${esc(f.corto)}</td><td>${EST[estadoF(f)]}</td><td>${f.sinBrecha ? 'Sin brecha' : `${f.brechas.length} (${f.brechas.filter(b => b.campos === b.total).length})`}</td>
     <td>${f.consolidado ? `${f.consolidado.grado} · ${f.consolidado.puntaje}/12` : (f.sinBrecha ? 'No aplica' : '<span class="pend">Incompleta</span>')}</td>
     <td>${REVT[(f.revision && f.revision.estado) || '']}${f.revision && f.revision.por && f.revision.estado ? `<br><span class="meta">${esc(f.revision.por)} · ${fHora(f.revision.ts)}</span>` : ''}</td>
@@ -293,7 +307,7 @@ function informeHTML(d) {
   <p class="meta">Escala de priorización: Alta 3, Media 2, Baja 1 por criterio; puntaje total Baja 1–4, Media 5–8, Alta 9–12. La priorización consolidada es el promedio redondeado de los hallazgos por criterio, igual que en la matriz oficial.</p>`;
   sel.forEach(f => {
     h += `<section class="fesp"><h2>FESP ${f.n}. ${esc(f.corto)}</h2><p class="meta">${esc(f.nombre)} · ${esc(f.area)}</p>`;
-    if (f.revision && f.revision.estado) h += `<table><tr><td class="k">Revisión del líder distrital</td><td><b>${REVT[f.revision.estado]}</b> · ${esc(f.revision.por || '')} · ${fHora(f.revision.ts)}${f.revision.obs ? '<br>Observaciones: ' + esc(f.revision.obs) : ''}${f.revision.estado === 'corregida' ? '<br>Corregida por ' + esc(f.revision.corregidaPor || '') + ' · ' + fHora(f.revision.tsCorr) : ''}</td></tr></table>`;
+    if (f.revision && f.revision.estado) h += `<table><tr><td class="k">Revisión de la Jefatura Jurisdiccional</td><td><b>${REVT[f.revision.estado]}</b> · ${esc(f.revision.por || '')} · ${fHora(f.revision.ts)}${f.revision.obs ? '<br>Observaciones: ' + esc(f.revision.obs) : ''}${f.revision.estado === 'corregida' ? '<br>Corregida por ' + esc(f.revision.corregidaPor || '') + ' · ' + fHora(f.revision.tsCorr) : ''}</td></tr></table>`;
     if (f.sinBrecha) { h += `<table><tr><td class="k">Resultado</td><td>Sin brecha identificada</td></tr><tr><td class="k">Observaciones</td><td>${val(f.obs, true)}</td></tr></table>` + cajaValidacion(''); h += '</section>'; return; }
     if (!f.brechas.length) { h += '<p class="pend">Sin hallazgos capturados.</p></section>'; return; }
     if (f.consolidado) h += `<table><tr><th>Priorización consolidada</th>${CRN.map(c => `<th>${c}</th>`).join('')}<th>Puntaje</th><th>Grado</th></tr><tr><td>Para la matriz oficial</td>${f.consolidado.niveles.map(x => `<td>${x}</td>`).join('')}<td>${f.consolidado.puntaje}</td><td><b>${f.consolidado.grado}</b></td></tr></table>`;
@@ -325,7 +339,9 @@ function informeHTML(d) {
     h += '</section>';
   });
   h += `<h2>Dictamen general</h2><div class="val">☐ Se valida la captura &nbsp;&nbsp; ☐ Se valida con ajustes &nbsp;&nbsp; ☐ No se valida<br>Observaciones generales:<div class="lin"></div><div class="lin"></div><div class="lin"></div></div>
-  <div class="firmas"><div>Elaboró<br>Líder distrital · ${esc(d.jur)}</div><div>Revisó<br>Gerencia y Rectoría en Salud</div><div>Validó<br>Coordinación Estatal SNSP ${esc(d.entidad || 'Morelos')}</div></div>`;
+  <p class="nota-ed noimp">✎ Puede corregir los nombres y cargos de las firmas haciendo clic sobre ellos antes de imprimir o descargar. Para dejarlos fijos, cámbielos en la hoja «Configuración» (firmaElaboro, firmaReviso, firmaValido).</p>
+  <div class="firmas">${[['Elaboró', F.elaboro], ['Revisó', F.reviso], ['Validó', F.valido]].map(([t, x]) =>
+    `<div><span class="ft">${t}</span><span class="fn" contenteditable="true">${esc(x.nombre) || '&nbsp;'}</span><span class="fc" contenteditable="true">${esc(x.cargo) || '&nbsp;'}</span></div>`).join('')}</div>`;
   return h;
 }
 async function generarInforme() {
@@ -344,10 +360,17 @@ async function generarInforme() {
 function alertaMin(m) { $('upd').textContent = m; }
 $('infClose').addEventListener('click', () => { $('informe').classList.add('hide'); document.body.style.overflow = ''; });
 $('infPrint').addEventListener('click', () => { try { window.print(); } catch (e) {} });
+function hojaParaWord() {
+  // Copia de lo que se ve en pantalla (incluye nombres y cargos corregidos a mano)
+  const c = $('infHoja').cloneNode(true);
+  c.querySelectorAll('.noimp').forEach(e => e.remove());
+  c.querySelectorAll('[contenteditable]').forEach(e => e.removeAttribute('contenteditable'));
+  return c.innerHTML;
+}
 $('infWord').addEventListener('click', () => {
   if (!INF) return;
-  const css = `body{font-family:Arial,sans-serif;font-size:10.5pt;color:#24191C}h1{font-size:18pt;color:#701631;margin:0}h2{font-size:13pt;color:#701631;border-bottom:1px solid #ccc;margin-top:16pt}h3{font-size:11pt;margin:10pt 0 4pt}table{border-collapse:collapse;width:100%;margin:4pt 0 8pt}th,td{border:1px solid #bbb;padding:3pt 5pt;vertical-align:top;font-size:9.5pt;text-align:left}th{background:#f3eee6}.k{background:#faf7f3;font-weight:bold;width:26%}.pend{color:#9b2c2c;font-weight:bold}.meta{color:#6B5F62;font-size:9pt}.val{border:1px dashed #999;padding:6pt;margin:4pt 0 10pt}.lin{border-bottom:1px solid #999;height:14pt}.encab img{height:40pt}.firmas div{display:inline-block;width:30%;margin:30pt 1% 0;border-top:1px solid #333;text-align:center;font-size:9pt;padding-top:4pt}.fesp{page-break-before:always}`;
-  const html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word"><head><meta charset="utf-8"><title>Informe para validación</title><style>${css}</style></head><body>${informeHTML(INF)}</body></html>`;
+  const css = `body{font-family:Arial,sans-serif;font-size:10.5pt;color:#24191C}h1{font-size:18pt;color:#701631;margin:0}h2{font-size:13pt;color:#701631;border-bottom:1px solid #ccc;margin-top:16pt}h3{font-size:11pt;margin:10pt 0 4pt}table{border-collapse:collapse;width:100%;margin:4pt 0 8pt}th,td{border:1px solid #bbb;padding:3pt 5pt;vertical-align:top;font-size:9.5pt;text-align:left}th{background:#f3eee6}.k{background:#faf7f3;font-weight:bold;width:26%}.pend{color:#9b2c2c;font-weight:bold}.meta{color:#6B5F62;font-size:9pt}.val{border:1px dashed #999;padding:6pt;margin:4pt 0 10pt}.lin{border-bottom:1px solid #999;height:14pt}.encab img{height:40pt}.firmas{margin-top:40pt;text-align:center}.firmas>div{display:inline-block;width:30%;margin:0 1%;vertical-align:top;text-align:center;font-size:9pt}.firmas .ft{display:block;font-weight:bold;color:#701631;margin-bottom:34pt}.firmas .fn{display:block;border-top:1px solid #333;padding-top:4pt;font-weight:bold}.firmas .fc{display:block}.fesp{page-break-before:always}`;
+  const html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word"><head><meta charset="utf-8"><title>Informe para validación</title><style>${css}</style></head><body>${hojaParaWord()}</body></html>`;
   const blob = new Blob(['\ufeff', html], {type: 'application/msword'});
   const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
   a.download = 'Informe_validacion_FESP_' + INF.jur.replace(/[^A-Za-z0-9ÁÉÍÓÚáéíóúÑñ]+/g, '_') + '.doc';
@@ -382,4 +405,5 @@ cargar();
 </script>
 </body>
 </html>
+
 
