@@ -140,7 +140,7 @@ footer{font-size:11.5px;color:var(--mu);padding:8px 16px 24px;max-width:920px;ma
 #fespBlocks > .card.ro .brecha{background:#fbfaf8}
 .secnav button.ro{border-style:dashed;opacity:.75}
 .secnav button.ro::before{content:"🔒";position:absolute;bottom:-6px;left:-4px;font-size:10px}
-/* ===== Revisión del líder distrital ===== */
+/* ===== Revisión de la Jefatura Jurisdiccional ===== */
 .revp{border-radius:12px;padding:12px 14px;margin:16px 0 4px;font-size:13.5px;border:1.5px solid var(--ln);background:#faf7f3}
 .revp .rt{font-weight:700;color:var(--g);margin-bottom:4px}
 .revp.validada{background:#eef5ef;border-color:#9fcbb0}
@@ -393,10 +393,10 @@ function renderRev(b){
   let det='';
   if(e==='validada')det=`✓ Validada por <b>${esc(r.por||'')}</b> · ${fechaHora(r.ts)}${r.obs?`<br>Observaciones: ${esc(r.obs)}`:''}${esLider()?'':'<br>La FESP queda en solo lectura para el equipo.'}`;
   else if(e==='ajustes')det=`⚠ <b>${esc(r.por||'')}</b> solicitó ajustes · ${fechaHora(r.ts)}<br><b>Observaciones:</b> ${esc(r.obs||'')}`;
-  else if(e==='corregida')det=`↻ Corregida por <b>${esc(r.corregidaPor||'')}</b> · ${fechaHora(r.tsCorr)}. Ajustes solicitados: ${esc(r.obs||'')}<br>Pendiente de nueva revisión del líder distrital.`;
-  else det='Esta FESP aún no ha sido revisada por el líder distrital.';
+  else if(e==='corregida')det=`↻ Corregida por <b>${esc(r.corregidaPor||'')}</b> · ${fechaHora(r.tsCorr)}. Ajustes solicitados: ${esc(r.obs||'')}<br>Pendiente de nueva revisión de la Jefatura Jurisdiccional.`;
+  else det='Esta FESP aún no ha sido revisada por la Jefatura Jurisdiccional.';
   box.className='revp '+e;
-  box.innerHTML=`<div class="rt">Revisión del líder distrital · <span class="est">${REV_TXT[e]}</span></div><div>${det}</div>`+
+  box.innerHTML=`<div class="rt">Revisión de la Jefatura Jurisdiccional · <span class="est">${REV_TXT[e]}</span></div><div>${det}</div>`+
    (esLider()?`<textarea placeholder="Observaciones de la revisión (obligatorias para solicitar ajustes)">${esc(r.obs||'')}</textarea>
     <div class="row"><button type="button" class="btn bok" onclick="revisar(${n},'validada')">✓ Validar FESP</button>
     <button type="button" class="btn baj" onclick="revisar(${n},'ajustes')">⚠ Solicitar ajustes</button>
@@ -404,7 +404,7 @@ function renderRev(b){
 }
 function renderRevTodas(){bloques().forEach(renderRev);if(cur===3)buildResumen()}
 function revisar(n,estado){
-  if(!esLider()){toast('Solo el líder distrital (clave maestra) puede revisar.');return}
+  if(!esLider()){toast('Solo la Jefatura Jurisdiccional (clave maestra) puede revisar.');return}
   if(!LIVE.on){toast('La revisión requiere conexión con el servidor.');return}
   const b=$('fb'+n),ta=b?b.querySelector('.revp textarea'):null,obs=(ta?ta.value:((REV[n]||{}).obs||'')).trim();
   if(estado==='ajustes'&&!obs){toast('Escriba las observaciones para el equipo antes de solicitar ajustes.');if(ta)ta.focus();return}
@@ -442,7 +442,7 @@ function accPanel(b){
   const n=+b.dataset.n,box=b.querySelector('.acc');if(!box)return;
   if(!clavesActivas()){box.classList.add('hide');return}
   box.classList.remove('hide');const ed=puedeEditar(n);
-  if(!ed&&tieneClave(n)&&revEstado(n)==='validada'){box.className='acc si';box.innerHTML='✓ <b>FESP validada por el líder distrital.</b> Queda en solo lectura; si requiere un cambio, solicítelo al líder.';return}
+  if(!ed&&tieneClave(n)&&revEstado(n)==='validada'){box.className='acc si';box.innerHTML='✓ <b>FESP validada por la Jefatura Jurisdiccional.</b> Queda en solo lectura; si requiere un cambio, solicítelo a la Jefatura Jurisdiccional.';return}
   if(ed){box.className='acc si';box.innerHTML=`✓ <b>Usted puede editar esta FESP</b>${ACC.all?' (clave maestra)':''}.`;return}
   if(box.classList.contains('no')&&box.querySelector('input'))return;
   box.className='acc no';
@@ -469,8 +469,15 @@ function liveKeyB(el){const fb=el.closest('[data-n]');return 'b:'+(fb?fb.dataset
 function horaCorta(){return new Date().toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit',second:'2-digit'})}
 function liveSecLabel(){if(cur!==2)return ['','Datos','FESP','Revisión','Enviado'][cur]||'';if(sec===0)return 'Selección';const b=bloques()[sec-1];return b?'FESP '+b.dataset.n:''}
 let CAP_JUR='';
+function textosPre(j){const t=new Set();const p=(CONFIG.precarga||{})[j]||{};Object.values(p).forEach(f=>(f.brechas||[]).forEach(b=>t.add(String(b.hallazgo).trim())));return t}
+function esAjena(j){
+  // ¿Lo que hay en pantalla trae hallazgos precargados de OTRA Jurisdicción?
+  const mios=textosPre(j),otras=new Set();
+  Object.keys(CONFIG.precarga||{}).forEach(k=>{if(k!==j)textosPre(k).forEach(t=>{if(!mios.has(t))otras.add(t)})});
+  return [...document.querySelectorAll('.brecha')].some(el=>otras.has(String(el.dataset.orig||'').trim()));
+}
 function descartarSiOtraJur(j){
-  if(bloques().length&&CAP_JUR&&CAP_JUR!==j){resetCaptura();$('precargaBanner').classList.add('hide');toast('Se descartó el borrador de '+CAP_JUR+' que había en este equipo; se cargan los datos de '+j+'.')}
+  if(bloques().length&&((CAP_JUR&&CAP_JUR!==j)||esAjena(j))){if(!CAP_JUR||CAP_JUR===j)CAP_JUR='otra Jurisdicción';try{localStorage.removeItem(LS_KEY)}catch(e){}resetCaptura();$('precargaBanner').classList.add('hide');toast('Se descartó el borrador de '+CAP_JUR+' que había en este equipo; se cargan los datos de '+j+'.')}
   CAP_JUR=j;
 }
 function resetCaptura(){$('fespBlocks').innerHTML='';document.querySelectorAll('.fesp-opt').forEach(o=>{o.classList.remove('sel');o.querySelector('input').checked=false})}
@@ -509,10 +516,18 @@ function liveItemsPendientes(){const ks=Object.keys(LIVE.pend);const it=ks.map(k
 async function liveFlush(){
   if(!LIVE.on)return;const items=liveItemsPendientes();if(!items.length)return;
   try{const r=await apiLiveCall({action:'liveSave',jur:LIVE.jur,sid:LIVE.sid,user:liveUser(),items});
+    if(r&&r.ajena){limpiarAjena();return}
     if(!r||!r.ok)throw new Error('x');
-    (r.rechazados||[]).forEach(x=>toast(x.validada?'Esa FESP ya fue validada por el líder distrital; su cambio no se guardó.':x.soloLider?'Solo el líder distrital puede registrar la revisión.':x.sinAcceso?'No tiene contraseña para esa FESP; su cambio no se guardó.':`${x.holder} está editando ese hallazgo; su cambio no se guardó.`));
+    (r.rechazados||[]).forEach(x=>toast(x.validada?'Esa FESP ya fue validada por la Jefatura Jurisdiccional; su cambio no se guardó.':x.soloLider?'Solo la Jefatura Jurisdiccional puede registrar la revisión.':x.sinAcceso?'No tiene contraseña para esa FESP; su cambio no se guardó.':`${x.holder} está editando ese hallazgo; su cambio no se guardó.`));
     liveEstado('Guardado en vivo · '+horaCorta());
   }catch(e){items.forEach(it=>{if(!LIVE.pend[it.key])LIVE.pend[it.key]=()=>it.data});liveEstado('Sin conexión · reintentando');clearTimeout(LIVE.saveT);LIVE.saveT=setTimeout(liveFlush,5000)}
+}
+function limpiarAjena(){
+  // El servidor detectó hallazgos de otra Jurisdicción: se descarta lo local y se recarga lo correcto
+  LIVE.pend={};LIVE.mine=new Set();try{localStorage.removeItem(LS_KEY)}catch(e){}
+  resetCaptura();CAP_JUR='';LIVE.on=false;LIVE.jur='';
+  toast('Este equipo tenía un borrador de otra Jurisdicción; se descartó y se cargan los datos correctos.');
+  liveStart();
 }
 async function liveStart(){
   const jur=payload().ident.jurisdiccion;if(!jur)return;
@@ -573,7 +588,7 @@ async function liveOnFocus(e){
   LIVE.mine.add(k);liveApplyLocks();
   try{const r=await apiLiveCall({action:'lock',jur:LIVE.jur,sid:LIVE.sid,user:liveUser(),key:k,on:true});
     if(r&&r.locks)LIVE.locks=r.locks;
-    if(!r||!r.ok){LIVE.mine.delete(k);if(r&&r.holder)toast(`${r.holder} está editando este hallazgo.`);if(r&&r.validada)toast('Esta FESP ya fue validada por el líder distrital.')}
+    if(!r||!r.ok){LIVE.mine.delete(k);if(r&&r.holder)toast(`${r.holder} está editando este hallazgo.`);if(r&&r.validada)toast('Esta FESP ya fue validada por la Jefatura Jurisdiccional.')}
     liveApplyLocks();
   }catch(_){}
 }
@@ -972,7 +987,7 @@ function buildResumen(){
     const pt=CRITERIOS.reduce((s,cr)=>s+(NIVELES.find(x=>x[0]===b.crit[cr.k].nivel)||[0,0])[1],0),g=grado(pt);
     rows+=`<tr><td>${f.n}. ${esc(c.corto)}</td><td>${k+1}</td><td>${esc(b.hallazgo.slice(0,140))}${b.hallazgo.length>140?'…':''}</td><td>${pt}</td><td><span class="pill ${g}">${g}</span></td><td>${esc(b.inicio)} → ${esc(b.fin)}</td></tr>`})});
   const EF={pend:'Pendiente',mid:'En proceso',ok:'Completa'};
-  const rg=LIVE.on?`<h3 style="margin:4px 0">Revisión general por FESP</h3><p class="hint">${esLider()?'Como líder distrital puede validar cada FESP o abrirla para revisarla, modificarla o solicitar ajustes; los cambios se guardan en vivo.':'Estado de la revisión del líder distrital de cada FESP.'}</p>
+  const rg=LIVE.on?`<h3 style="margin:4px 0">Revisión general por FESP</h3><p class="hint">${esLider()?'Como Jefatura Jurisdiccional puede validar cada FESP o abrirla para revisarla, modificarla o solicitar ajustes; los cambios se guardan en vivo.':'Estado de la revisión de la Jefatura Jurisdiccional de cada FESP.'}</p>
    <div style="overflow-x:auto"><table class="rg"><tr><th>FESP</th><th>Captura</th><th>Revisión</th><th></th></tr>${bloques().map(b=>{const n=+b.dataset.n,c=CATALOGO.find(x=>x.n===n),e=revEstado(n),r=REV[n]||{};
      const cap=b.querySelector('.sb').checked?'Sin brecha':(EF[estadoFesp(b)]||'Pendiente');
      return `<tr><td>${n}. ${esc(c.corto)}</td><td>${cap}</td><td><span class="chipR ${e||'pend'}">${REV_TXT[e]}</span>${r.por&&e?`<br><span class="hint" style="margin:0">${esc(r.por)} · ${fechaHora(r.ts)}</span>`:''}</td>
